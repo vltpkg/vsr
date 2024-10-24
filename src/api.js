@@ -1,7 +1,8 @@
+const { version } = require('./package.json');
 export const API =  {
   "openapi": "3.0.0",
   "info": {
-    "title": "vlt serverless registry documentation",
+    "title": `vlt serverless registry v${version} - api documentation`,
     "version": "1.0.0"
   },
   "components": {

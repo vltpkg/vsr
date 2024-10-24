@@ -57,6 +57,13 @@ export async function postToken(c) {
     return c.json({ error: 'Missing scope' }, 400)
   }
   const token = uuidv6()
+
+  // if uuid starts with "~" then throw
+  const specialChars = ['~', '!', '*', '^', '&']
+  if (specialChars.some(char => uuid.startsWith(char))) {
+    return c.json({ error: 'Invalid uuid - uuids can not start with special characters (ex. - ~ ! * ^ &)' }, 400)
+  }
+
   // new tokens that generate a "user" should grant read+write access to themselves
   scope = scope.push({
     "values": [`~${uuid}`],
@@ -69,8 +76,12 @@ export async function postToken(c) {
   })
   // TODO: add conditional logic for generating a new token with an existing user
   // TODO: validate read+write tokens as they're only allowed to be added by privileged users
-  const query = `INSERT INTO tokens (uuid, token, scope) VALUES ("${uuid}", "${token}", json('${JSON.stringify(scope)}'))`
-  await c.env.DB.prepare(query).run()
+  try {
+    const query = `INSERT INTO tokens (uuid, token, scope) VALUES ("${uuid}", "${token}", json('${JSON.stringify(scope)}'))`
+    await c.env.DB.prepare(query).run()
+  } catch (e) {
+    return c.json({ error: 'Token or user already exists' }, 400)
+  }
   return c.json({ scope, uuid, token })
 }
 

@@ -1,100 +1,81 @@
-# vlt serverless registry (`vsr`)
+# **vlt** serverless registry (`vsr`)
 
-## TODOs
+`vsr` aims to be a minimal "npm-compatible" registry which replicates the core features found in `registry.npmjs.org` as well as adding net-new capabilities.
 
-- [x] setup worker (domain + bindings)
-- [x] setup bucket (permissions + bindings)
-- [x] setup db (structure + bindings)
-- [x] add check for upgrade attack (ie. user grants themselves admin perms)
-- [x] migrate users into `tokens` (maybe change this to "users")
-- [x] migrate packages into `versions`
-- [x] add custom logic to handle `@gsap/shockingly` = `@gsap/premium` | `@gsap/simply` = `@gsap/pro`
-- [x] setup cloudflare access/event logs
-- [x] add OpenAPI & Scalar docs
-- [ ] add sentry error logging
-- [ ] add rate limitter
-- [ ] write tests
+**Table of Contents:**
 
-### Support
+- [Quick Starts](#quick-starts)
+- [Requirements](#requirements)
+- [Features](#features)
+- [API](#api)
+- [Compatibility](#compatibility)
+- [License](#license)
 
-`vsr` aims to be a minimal "npm-compatible" private registry which replicates the core features found in `registry.npmjs.org` as well as adding net-new capabilities required to service transitive users.
+### Quick Starts
 
-| Status | Feature | Support |
-| :--: | :-- | :--: |
-| ☑️ | caching | ✅ |
-| ☑️ | rate limiting | ✅ |
-| ☑️ | error logs | ✅ |
-| ✅ | user activity logs | ✅ |
-| ✅ | fetch minimal package metadata | ✅ |
-| ✅ | fetch full package manifests | ✅ |
-| ✅ | publishing private, scoped packages | ✅ |
-| ✅ | package manifest validation | ✅ |
-| ✅ | user token management (add/remove) | ✅ |
-| ✅ | admin/owner user management (add/update/remove) | ✅ |
-| | user web registration | 🕤 |
-| | user web login (ex. `npm login` / `--auth-type=web`) | 🕤 |
-| | user web account management | 🕤 |
-| | admin/owner user web account management | 🕤 |
-| | custom dist-tags (`latest`  is supported) | 🕤 |
-| | token rate-limiting | 🕤 |
-| | search | 🕤 |
-| | staging | 🕤 |
+#### Production
 
-- 🕤 planned to support
+You can deploy `vsr` to [Cloudflare](https://www.cloudflare.com/) in under 5 minutes, for free, with a single click.
 
-### `npm` Compatible Commands
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/vltpkg/vsr)
 
-| Support | Commannd |
-| :--: | :-- |
-| ✅ | `npm access` |
-| ✅ | `npm access list packages` |
-| ✅ | `npm access get status` |
-| ❌ | `npm access set status` |
-| ❌ | `npm access set mfa` |
-| ❌ | `npm access grant` |
-| ❌ | `npm access revoke` |
-| ❌ | `npm adduser` |
-| ❌ | `npm audit` |
-| ✅ | `npm bugs` |
-| ❌ | `npm dist-tag add` |
-| ❌ | `npm dist-tag rm` |
-| ❌ | `npm dist-tag ls` |
-| ✅ | `npm docs` |
-| ✅ | `npm exec` |
-| ❌ | `npm hook` |
-| ✅ | `npm install` |
-| ❌ | `npm login` |
-| ❌ | `npm logout` |
-| ❌ | `npm org` |
-| ✅ | `npm outdated` |
-| ❌ | `npm owner add` |
-| ❌ | `npm owner rm` |
-| ❌ | `npm owner ls` |
-| ✅ | `npm ping` |
-| ❌ | `npm profile enable-2fa` |
-| ❌ | `npm profile disable-2fa` |
-| ✅ | `npm profile get` |
-| ❌ | `npm profile set` |
-| ✅ | `npm publish` |
-| ✅ | `npm repo` |
-| ❌ | `npm search` |
-| ❌ | `npm star` |
-| ❌ | `npm team` |
-| ✅ | `npm view` |
-| ✅ | `npm whoami` |
+Alternatively, you can deploy to production using [`wrangler`](https://www.npmjs.com/package/wrangler) after following the **Development** quick start steps.
 
-### Production Requirements
+#### Development
 
-- Cloudflare
-  - Workers
-  - D1 Database
-  - R2 Bucket
+```bash
+# clone the repo
+git clone https://github.com/vltpkg/vsr.git
 
-### Development Requirements
+# navigate to the repository directory
+cd ./vsr
 
+# install the project's dependencies
+vlt install
+
+# run tbe development script
+vlr dev
+```
+
+### Requirements
+
+#### Production
+
+- [Cloudflare (free account at minimum)](https://www.cloudflare.com/en-ca/plans/developer-platform/)
+  - Workers (free: 100k requests /day)
+  - D1 Database (free: 100k writes, 5M reads /day & 5GB Storage /mo)
+  - R2 Bucket (free: 1M writes, 10M reads & 10GB /mo)
+
+> Note: all usage numbers & pricing documented is as of **October 24th, 2024**. Plans & metering is subject to change at Cloudflare's discretion.
+
+#### Development
+
+- `git`
 - `node`
-- `npm`
-- `wrangler`
+- `vlt`
+
+### Features
+
+| Status | Feature |
+| :--: | :-- |
+| ✅ | api: minimal package metadata |
+| ✅ | api: full package manifests |
+| ✅ | api: publishing private, scoped packages |
+| ✅ | api: package manifest validation |
+| ✅ | api: admin user management (add/update/remove users) |
+| ✅ | api: user token management (add/update/remove tokens) |
+| ✅ | web: docs portal |
+| 🕤 | web: admin user management |
+| 🕤 | web: user registration |
+| 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
+| 🕤 | web: user account management |
+| 🕤 | web & api: custom dist-tags (`latest`  is supported) |
+| 🕤 | web & api: token rate-limiting |
+| 🕤 | web & api: search |
+| 🕤 | web & api: staging |
+
+- ✅ implemented
+- 🕤 planned to support
 
 ### Configuration
 
@@ -297,3 +278,63 @@ $ npm token revoke <token>
 
 #### `DELETE /-/npm/v1/user/<uuid>`
 - Deletes a user (requires admin privileges)
+
+### `npm` Client Compatibility
+
+The following commands should work out-of-the-box with `npm` & any other `npm` "Compatible" clients although their specific commands & arguments may be vary (ex. `vlt`, `yarn`, `pnpm` & `bun`)
+
+#### Configuration
+
+To use a registry you must either pass the registry config through an flag (ex. `--registry=...` for `npm`) or define client-specific configuration which stores the reference to your registry (ex. `.npmrc` for `npm`)
+
+```ini
+; .npmrc
+registry=https://registry.example.com
+```
+
+| Support | Commannd |
+| :--: | :-- |
+| ✅ | `access` |
+| ✅ | `access list packages` |
+| ✅ | `access get status` |
+| ❌ | `access set status` |
+| ❌ | `access set mfa` |
+| ❌ | `access grant` |
+| ❌ | `access revoke` |
+| ❌ | `adduser` |
+| ❌ | `audit` |
+| ✅ | `bugs` |
+| ❌ | `dist-tag add` |
+| ❌ | `dist-tag rm` |
+| ❌ | `dist-tag ls` |
+| ✅ | `deprecate` |
+| ✅ | `docs` |
+| ✅ | `exec` |
+| ❌ | `hook` |
+| ✅ | `install` |
+| ❌ | `login` |
+| ❌ | `logout` |
+| ❌ | `org` |
+| ✅ | `outdated` |
+| ❌ | `owner add` |
+| ❌ | `owner rm` |
+| ❌ | `owner ls` |
+| ✅ | `ping` |
+| ❌ | `profile enable-2fa` |
+| ❌ | `profile disable-2fa` |
+| ✅ | `profile get` |
+| ❌ | `profile set` |
+| ✅ | `publish` |
+| ✅ | `repo` |
+| ❌ | `search` |
+| ❌ | `star` |
+| ❌ | `team` |
+| ✅ | `view` |
+| ✅ | `whoami` |
+
+- ✅ supported
+- ❌ unsupported
+
+### License
+
+This project is licensed under the [Fair Core License](https://fcl.dev/) ([**FCL-1.0-MIT**](LICENSE.md)).

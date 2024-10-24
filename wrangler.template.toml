@@ -1,0 +1,19 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "vlt-serverless-registry"
+main = "src/index.js"
+compatibility_date = "2024-08-25"
+workers_dev = true
+logpush = true
+compatibility_flags = [ "nodejs_compat" ]
+
+[placement]
+mode = "smart"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "vsr-<name>"
+database_id = "<id>"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "vsr-<name>"

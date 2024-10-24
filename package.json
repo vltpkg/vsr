@@ -1,12 +1,13 @@
 {
   "name": "vlt-serverless-registry",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
+    "next-dev": "wrangler dev --local --persist-to dev",
+    "dev": "wrangler dev --local",
     "start": "wrangler dev",
-    "setup": "wangler d1 create-",
+    "next-setup": "wangler d1 create-",
     "lint": "prettier ."
   },
   "devDependencies": {
@@ -14,7 +15,7 @@
     "npm-registry-fetch": "^17.1.0",
     "prettier": "^3.3.3",
     "ssri": "^10.0.6",
-    "wrangler": "^3.71.0"
+    "wrangler": "^3.78.7"
   },
   "dependencies": {
     "@scalar/hono-api-reference": "^0.5.133",

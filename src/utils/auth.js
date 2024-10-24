@@ -92,6 +92,13 @@ export async function getAuthedUser ({ c, token }) {
 
 export async function verifyToken (token, c) {
 
+  const method = c.req.method ? c.req.method.toLowerCase() : ''
+
+  // return early for fetching gsap react
+  if (method === 'get' && c.req.path.startsWith('/@gsap/react')) {
+    return true
+  }
+
   if (!token) {
     return false
   }
@@ -114,7 +121,7 @@ export async function verifyToken (token, c) {
       methods
     } = parseTokenAccess({scope, pkg, uuid})
 
-    const methodAllowed = methods.includes(c.req.method.toLowerCase())
+    const methodAllowed = methods.includes(method)
 
     // if the route is a user route
     if (routeType === 'user') {

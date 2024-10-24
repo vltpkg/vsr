@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import validate from 'validate-npm-package-name'
 import semver from 'semver'
 import { accepts } from 'hono/accepts'
@@ -30,9 +31,17 @@ export async function getPackageManifest (c) {
     return c.json({ error: `Version not found: ${version}` }, 404)
   }
 
+  // return early for fetching gsap react
+  if (pkg === '@gsap/react') {
+    const ret = await fetch(`https://registry.npmjs.org/@gsap/react/${version}`)
+    const json = await ret.json()
+    return c.json(json, 200)
+  }
+
   if (version === 'latest') {
     const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
     const packument = await c.env.DB.prepare(packumentQuery).run()
+    console.log(packument)
     version = JSON.parse(packument.results[0].tags).latest
   }
   const versionsQuery = `SELECT * FROM versions WHERE spec = "${pkg}@${version}"`
@@ -50,6 +59,14 @@ export async function getPackageManifest (c) {
 }
 
 export async function getPackagePackument (c) {
+
+  // return early for fetching gsap react
+  if (c.req.path.startsWith('/@gsap/react')) {
+    const ret = await fetch('https://registry.npmjs.org/@gsap/react')
+    const json = await ret.json()
+    return c.json(json, 200)
+  }
+
   const { pkg, ref } = packageSpec(c)
   if (!pkg) {
     return c.json({ error: 'Not found' }, 404)
@@ -113,12 +130,29 @@ export async function publishPackage (c) {
   if (!new_versions.length) {
     return c.json({ error: 'Nothing to publish' }, 409)
   } else if (versions.length > 1) {
-    return c.json({ error: 'Existing Conflict' }, 409)
+    return c.json({ error: 'Existing package conflict' }, 409)
+  } else if (new_versions.length > 1) {
+    return c.json({ error: 'Too many new versions' }, 409)
   }
 
   // extract new version information
+  let existing = versions[0]
   let version = new_versions[0]
   const manifest = body.versions[version]
+
+  // check for deprecation, update existing version & return early
+  if (manifest.hasOwnProperty(deprecated)) {
+    if (manifest.deprecated === '') {
+      delete existing.deprecated
+    } else {
+      existing.deprecated = manifest.deprecated
+    }
+    const query = `
+    INSERT INTO versions (spec, manifest, published_at)
+    VALUES ("${pkg}@${version}", json('${JSON.stringify(existing)}'), "${new Date().toISOString()}")`
+    await c.env.DB.prepare(query).run()
+    return c.json({}, 200)
+  }
 
   // validate name
   if (validate(pkg).validForNewPackages === false) {
@@ -135,7 +169,7 @@ export async function publishPackage (c) {
     return c.json({ error: 'Manifest Conflict' }, 409)
   }
 
-  // get file out of manifest
+  // get file out of manifest as we're continuing to publish
   const filename = `${pkg}-${version}.tgz`
   const file = body._attachments[filename]
   if (!file) {
