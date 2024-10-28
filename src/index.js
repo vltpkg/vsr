@@ -14,6 +14,7 @@ import { API_DOCS } from './config.js'
 import { verifyToken } from './utils/auth'
 import { getUsername, getUserProfile } from './routes/users'
 import { getToken, putToken, postToken, deleteToken } from './routes/tokens'
+import { packageSpec } from './utils/packages'
 
 import {
   getPackageTarball,
@@ -48,6 +49,24 @@ app.get('/-/ping/', (c) => c.json({}, 200))
 // GET scalar API reference
 app.get('/-/docs', apiReference(API_DOCS))
 app.get('/-/docs/', apiReference(API_DOCS))
+
+// -------------------------
+// Proxied Requests
+// -------------------------
+
+async function proxyRoute (c) {
+  let { ref, version } = packageSpec(c)
+  const ret = await fetch(`${c.env.PROXIES[ref]}${ref}/${version}`)
+  const json = await ret.json()
+  return c.json(json, 200)
+}
+
+if (c.env.PROXIES) {
+  for (const proxy of c.env.PROXIES) {
+    app.get(proxy, proxyRoute)
+    app.get(`${proxy}/`, proxyRoute)
+  }
+}
 
 // -------------------------
 // Users / Authentication

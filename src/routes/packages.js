@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import validate from 'validate-npm-package-name'
 import semver from 'semver'
 import { accepts } from 'hono/accepts'
-import { SCOPE, DOMAIN } from '../config.js'
+import { SCOPE, DOMAIN } from '../config'
 import {
   extractPackageJSON,
   packageSpec,

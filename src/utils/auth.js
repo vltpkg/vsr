@@ -1,5 +1,5 @@
-import { ANY_PACKAGE_SPEC } from '../config.js'
-import { packageSpec } from './packages.js'
+import { ANY_PACKAGE_SPEC } from '../config'
+import { packageSpec } from './packages'
 
 export function getTokenFromHeader (c) {
   const auth = c.req.header('Authorization')

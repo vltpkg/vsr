@@ -1,4 +1,4 @@
-import { getAuthedUser } from '../utils/auth.js'
+import { getAuthedUser } from '../utils/auth'
 
 export async function getUsername (c) {
   const { uuid } = await getAuthedUser({c})

@@ -65,6 +65,8 @@ vlr dev
 | ✅ | api: admin user management (add/update/remove users) |
 | ✅ | api: user token management (add/update/remove tokens) |
 | ✅ | web: docs portal |
+| ⏳ | api: unscoped packages |
+| ⏳ | api: unscoped packages |
 | 🕤 | web: admin user management |
 | 🕤 | web: user registration |
 | 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
@@ -334,6 +336,36 @@ registry=https://registry.example.com
 
 - ✅ supported
 - ❌ unsupported
+
+### Competitive Breakdown
+
+| Feature | `vsr` | `verdaccio` | `jsr` |
+| -- | :-: | :-: | :-: |
+| Serverless | ✅ | ❌ | ❌ |
+| JavaScript Backend | ✅ | ✅ | ❌ |
+| Granular Access/Permissions | ✅ | ✅ | ❌ |
+| Proxy Upstream Registries | ✅ | ✅ | ❌ |
+| Unscoped Package Names | ✅ | ✅ | ❌ |
+| npm Package Publishing | ✅ | ✅ | ❌ |
+| npm Package Installation | ✅ | ✅ | ✅<sup>*</sup> |
+| CDN | ✅ | ❌ | ✅ |
+| ESM | ✅ | ❌ | ✅ |
+| Manifest Validation | ✅ | ❌ | ❌ |
+| Plugins | ❌ | ✅ | ❌ |
+| Events/Hooks | ❌ | ✅ | ❌ |
+| Programmatic API | ❌ | ✅ | ❌ |
+| Web Interface | ❌ | ✅ | ✅ |
+| Search | ❌ | ✅ | ✅ |
+| First-Class Typescript | ❌ | ❌ | ✅ |
+| API Documentation Generation | ❌ | ❌ | ✅ |
+| Multi-Cloud | ❌ | ✅ | ✅ |
+| **Azure DevOps Artifacts** Upstream | ✅ | ✅ | ✅ |
+| **JFrog Artifactory** Upstream | ✅ | ✅ | ❌ |
+| **Google Artifact Registry** Upstream | ✅ | ✅ | ❌ |
+
+```
+* requires jsr-specific tooling or use a modified package name when using traditional npm clients (ref. https://jsr.io/docs/npm-compatibility)
+```
 
 ### License
 

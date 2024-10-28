@@ -4,10 +4,7 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
-    "next-dev": "wrangler dev --local --persist-to dev",
-    "dev": "wrangler dev --local",
-    "start": "wrangler dev",
-    "next-setup": "wangler d1 create-",
+    "dev": "wrangler dev",
     "lint": "prettier ."
   },
   "devDependencies": {

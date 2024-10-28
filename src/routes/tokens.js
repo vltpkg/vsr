@@ -1,4 +1,4 @@
-import { v6 as uuidv6 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { getAuthedUser, parseTokenAccess } from '../utils/auth.js'
 
 export async function getToken(c) {
@@ -56,7 +56,7 @@ export async function postToken(c) {
   if (!scope) {
     return c.json({ error: 'Missing scope' }, 400)
   }
-  const token = uuidv6()
+  const token = uuidv4()
 
   // if uuid starts with "~" then throw
   const specialChars = ['~', '!', '*', '^', '&']
@@ -93,7 +93,7 @@ export async function putToken(c) {
     return c.json({ error: 'Unauthorized' }, 400)
   }
   const scope = body.scope ? `, scope = json('${JSON.stringify(body.scope)}')` : ''
-  const new_token = uuidv6()
+  const new_token = uuidv4()
   // TODO: privileged users can update any token, otherwise only their own
   const query = `UPDATE tokens SET token = "${new_token}" ${scope} WHERE ${type} = "${body[type]}"`
   await c.env.DB.prepare(query).run()
