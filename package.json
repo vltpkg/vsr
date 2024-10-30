@@ -1,26 +1,47 @@
 {
-  "name": "vlt-serverless-registry",
+  "name": "vsr",
   "version": "0.1.1",
   "private": true,
+  "bin": {
+    "vsr": "vsr"
+  },
   "scripts": {
+    "setup": "wrangler d1 execute vsr --local --file ./db/setup.sql",
+    "drop": "wrangler d1 execute vsr --local --file ./db/drop.sql",
+    "migrate": "wrangler d1 migrations apply vsr --local",
+    "dev": "wrangler dev --persist-to localstore",
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
+    "build": "NODE_NO_WARNINGS=1 node ./scripts/build.mjs",
     "lint": "prettier ."
   },
   "devDependencies": {
     "libnpmpack": "^7.0.4",
     "npm-registry-fetch": "^17.1.0",
     "prettier": "^3.3.3",
-    "ssri": "^10.0.6",
-    "wrangler": "^3.78.7"
+    "ssri": "^10.0.6"
   },
   "dependencies": {
-    "@scalar/hono-api-reference": "^0.5.133",
+    "@scalar/hono-api-reference": "^0.5.157",
     "hono": "^4.5.5",
     "hono-rate-limiter": "^0.4.0",
     "semver": "^7.6.3",
     "streaming-tarball": "^1.0.3",
     "uuid": "^10.0.0",
-    "validate-npm-package-name": "5.0.0"
+    "validate-npm-package-name": "5.0.0",
+    "wrangler": "^3.83.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">=22.11.0",
+    "npm": ">=10.9.0"
   }
 }

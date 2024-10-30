@@ -1,9 +1,22 @@
 const { version } = require('../package.json');
-export const API =  {
-  "openapi": "3.0.0",
+module.exports.API =  {
+  "openapi": "3.1.0",
   "info": {
     "title": `vlt serverless registry - api documentation`,
-    "version": version
+    "version": version,
+    "description": `
+  The Scalar Galaxy is an example OpenAPI specification to test OpenAPI tools and libraries. It’s a fictional universe with fictional planets and fictional data. Get all the data for [all planets](#tag/planets/GET/planets).
+
+  ## Resources
+
+  * https://github.com/scalar/scalar
+  * https://github.com/OAI/OpenAPI-Specification
+  * https://scalar.com
+
+  ## Markdown Support
+
+  All descriptions *can* contain ~~tons of text~~ **Markdown**. [If GitHub supports the syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax), chances are we’re supporting it, too. You can even create [internal links to reference endpoints](#tag/authentication/POST/user/signup).
+  `
   },
   "components": {
     "securitySchemes": {
@@ -20,6 +33,16 @@ export const API =  {
     }
   ],
   "paths": {
+    "/": {
+      "get": {
+        "summary": "Retrieve documentation portal",
+        "responses": {
+          "200": {
+            "description": "Retrieves the registry docs",
+          }
+        }
+      }
+    },
     "/-/whoami": {
       "get": {
         "summary": "Retrieve user name",

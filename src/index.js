@@ -10,7 +10,7 @@ import { apiReference } from '@scalar/hono-api-reference'
 import { secureHeaders } from 'hono/secure-headers'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 
-import { API_DOCS } from './config.js'
+import { PROXIES, API_DOCS } from '../config.js'
 import { verifyToken } from './utils/auth'
 import { getUsername, getUserProfile } from './routes/users'
 import { getToken, putToken, postToken, deleteToken } from './routes/tokens'
@@ -39,41 +39,46 @@ app.use(secureHeaders())
 app.use(prettyJSON({ space: 2 }))
 
 // -------------------------
-// Docs
-// -------------------------
-
-// GET /-/ping
-app.get('/-/ping', (c) => c.json({}, 200))
-app.get('/-/ping/', (c) => c.json({}, 200))
-
-// GET scalar API reference
-app.get('/-/docs', apiReference(API_DOCS))
-app.get('/-/docs/', apiReference(API_DOCS))
-
-// -------------------------
 // Proxied Requests
 // -------------------------
 
 async function proxyRoute (c) {
   let { ref, version } = packageSpec(c)
-  const ret = await fetch(`${c.env.PROXIES[ref]}${ref}/${version}`)
+  const ret = await fetch(`${PROXIES[ref]}${ref}/${version}`)
   const json = await ret.json()
   return c.json(json, 200)
 }
 
-if (c.env.PROXIES) {
-  for (const proxy of c.env.PROXIES) {
+if (PROXIES) {
+  for (const proxy of PROXIES) {
     app.get(proxy, proxyRoute)
     app.get(`${proxy}/`, proxyRoute)
   }
 }
 
 // -------------------------
-// Users / Authentication
+// Documentation
+// -------------------------
+
+// GET scalar API reference
+app.get('/', apiReference(API_DOCS))
+app.get('/-/docs', apiReference(API_DOCS))
+app.get('/-/docs/', apiReference(API_DOCS))
+
+// GET /-/ping
+app.get('/-/ping', (c) => c.json({}, 200))
+app.get('/-/ping/', (c) => c.json({}, 200))
+
+// -------------------------
+// Authorization
 // -------------------------
 
 // Verify token
 app.use('*', bearerAuth({ verifyToken }))
+
+// -------------------------
+// Users / Authentication
+// -------------------------
 
 // GET a user profile
 app.get('/-/whoami', getUsername)

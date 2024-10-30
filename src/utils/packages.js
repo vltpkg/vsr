@@ -1,4 +1,4 @@
-import { DOMAIN } from '../config.js'
+import { DOMAIN } from '../../config.js'
 import { Buffer } from 'node:buffer'
 import { extract } from 'streaming-tarball'
 import semver from 'semver'
