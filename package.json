@@ -21,9 +21,10 @@
     "ssri": "^10.0.6"
   },
   "dependencies": {
-    "@scalar/hono-api-reference": "^0.5.157",
+    "@scalar/hono-api-reference": "^0.5.158",
     "hono": "^4.5.5",
     "hono-rate-limiter": "^0.4.0",
+    "js-yaml": "^4.1.0",
     "semver": "^7.6.3",
     "streaming-tarball": "^1.0.3",
     "uuid": "^10.0.0",

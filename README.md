@@ -79,34 +79,6 @@ vlr dev
 - ✅ implemented
 - 🕤 planned to support
 
-### Configuration
-
-- `wrangler.toml`
-
-### Installation
-
-1. Clone this repo `gh repo clone @vltpkg/vsr`
-2. Install dependencies `npm install`
-3. Create a **D1 DB** `wrangler d1 create vsr-<org-name>`
-  - Take the output & add to `wrangler.toml` config, ex.
-
-```toml
-# example
-[[d1_databases]]
-binding = "DB" # sets env.DB which is available in configured workers
-database_name = "vsr-<org-name>"
-database_id = "<automatically-generated-id>"
-```
-
-4. Create a **R2 Bucket** `wrangler r2 bucket vsr-<org-name>`
-  - Add a `r2_buckets` entry to `wrangler.toml` config, ex.
-
-```toml
-[[r2_buckets]]
-binding = "BUCKET" # sets env.BUCKET which is available in configured workers
-bucket_name = "vsr-<org-name>"
-```
-
 ### Granular Access Tokens
 
 All tokens are considered "granular access tokens" (GATs). Token entries in the database consist of 3 parts:
@@ -134,10 +106,9 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
   - `@<scope>/*` glob scope selector for `pkg:` access types
 
 > [!NOTE]
-> - unscoped package names are not supported at the moment
 > - user/org/team management via `@<scope>` is not supported at the moment
 
-##### `pkg:read=@gsap/pro|user:read+write=~uuid-1234-5678` - `@gsap` subscriber
+##### Subscriber
 
 ```json
 [
@@ -162,7 +133,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-##### `pkg:read+write=@gsap/*` - `@gsap` team maintainer
+##### Maintainer
 
 ```json
 [
@@ -178,7 +149,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-##### `pkg:read+write=@gsap/*|user:read+write=*` - `@gsap` admin/owner
+##### Admin
 
 ```json
 [
@@ -202,18 +173,6 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
   }
 ]
 ```
-
-#### `scope` as a `String`
-
-A `scope` can also be represented as a string: `[[<type>,...]=[<value>,...]|...]`
-
-Examples:
-- `pkg:read+write=@gsap/*` gives maintainer access
-- `pkg:read+write=@gsap/*|user:read+write=*` gives admin access
-- `pkg:read=@gsap/*|pkg:write=@gsap/pro` scoped
-- `user:read+write=~uuid|pkg:read=@gsap/pro` specific user read + write & package read
-- `pkg:read=@gsap/premium` - premium
-- `pkg:read=@gsap/business` - business
 
 ### Documentation
 

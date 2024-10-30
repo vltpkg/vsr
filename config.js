@@ -21,16 +21,26 @@ export const REQUEST_TIMEOUT = 60 * 1000
 
 // the docs configuration for the API reference
 export const API_DOCS = {
+  metaData: {
+    title: 'vlt serverless registry'
+  },
   hideModels: false,
-  hideDownloadButton: true,
+  hideDownloadButton: false,
+  darkMode: false,
   defaultHttpClient: {
     targetKey: 'curl',
     clientKey: 'fetch',
   },
+  authentication: {
+    http: {
+      bearer: {
+        token: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+      }
+    }
+  },
   hiddenClients: {
-    node: ['native', 'undici', 'request', 'unirest'],
-    javascript: ['axios', 'xhr'],
-    php: false,
+    node: ['axios', 'native', 'undici', 'request', 'unirest'],
+    javascript: ['axios', 'xhr', 'jquery'],
     python: true,
     c: true,
     go: true,
@@ -46,12 +56,16 @@ export const API_DOCS = {
     powershell: true,
     ocaml: true,
     curl: false,
-    http: false,
+    http: true,
+    php: ['http1', 'http2', 'curl'],
   },
   spec: {
     content: API
   },
   customCss: `
+.open-api-client-button {
+  display: none !important;
+}
 :root {
   --scalar-text-decoration: underline;
 }

@@ -1,21 +1,22 @@
 const { version } = require('../package.json');
-module.exports.API =  {
+module.exports.API = {
   "openapi": "3.1.0",
   "info": {
-    "title": `vlt serverless registry - api documentation`,
+    "title": `vlt serverless registry`,
     "version": version,
     "description": `
-  The Scalar Galaxy is an example OpenAPI specification to test OpenAPI tools and libraries. It’s a fictional universe with fictional planets and fictional data. Get all the data for [all planets](#tag/planets/GET/planets).
+  The **vlt serverless registry** is a "npm-compatible" registry which replicates core features & functionality of \`registry.npmjs.org\` while adding net-new capabilities.
+
+  ## Supported Clients
+
+  <table>
+    <tr><td><img src="" />></td><td>npm</td></tr>
+  </table>
 
   ## Resources
 
-  * https://github.com/scalar/scalar
-  * https://github.com/OAI/OpenAPI-Specification
-  * https://scalar.com
-
-  ## Markdown Support
-
-  All descriptions *can* contain ~~tons of text~~ **Markdown**. [If GitHub supports the syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax), chances are we’re supporting it, too. You can even create [internal links to reference endpoints](#tag/authentication/POST/user/signup).
+  * https://vlt.sh
+  * https://github.com/vltpkg/vsr
   `
   },
   "components": {
@@ -32,10 +33,74 @@ module.exports.API =  {
       "bearerAuth": []
     }
   ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Some endpoints are public, but some require authentication. We provide all the required endpoints to create an account and authorize yourself."
+    },
+    {
+      "name": "Tokens",
+      "description": ""
+    },
+    {
+      "name": "Packages",
+      "description": ""
+    },
+    {
+      "name": "Misc.",
+      "description": ""
+    },
+  ],
   "paths": {
+    "/-/npm/v1/user": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get User Profile",
+        "description": "Get the user profile",
+        "responses": {
+          "200": {
+            "description": "User Profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "name": "johnsmith"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/-/ping": {
+      "get": {
+        "tags": ["Misc."],
+        "summary": "Ping",
+        "description": "Check if the server is alive",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Server is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/": {
       "get": {
-        "summary": "Retrieve documentation portal",
+        "tags": ["Misc."],
+        "summary": "Documentation",
+        "description": "Get the registry docs",
         "responses": {
           "200": {
             "description": "Retrieves the registry docs",
@@ -43,9 +108,14 @@ module.exports.API =  {
         }
       }
     },
+    "/-/docs": {
+      "$ref": "#/paths/~1"
+    },
     "/-/whoami": {
       "get": {
-        "summary": "Retrieve user name",
+        "tags": ["Users"],
+        "summary": "Get User Username",
+        "description": "Get a user's username",
         "responses": {
           "200": {
             "description": "Retrieves a user name",
@@ -63,51 +133,14 @@ module.exports.API =  {
         }
       }
     },
-    "/-/npm/v1/user": {
-      "get": {
-        "summary": "Get user profile",
-        "responses": {
-          "200": {
-            "description": "User profile",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "example": {
-                    "name": "johnsmith"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/-/ping": {
-      "get": {
-        "summary": "Ping the server",
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "Server is alive",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "example": {}
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/-/npm/v1/tokens": {
       "get": {
-        "summary": "Get a token profile",
+        "tags": ["Tokens"],
+        "summary": "Get a Token Profile",
+        "description": "Get a token profile",
         "responses": {
           "200": {
-            "description": "Token profile",
+            "description": "Token Profile",
             "content": {
               "application/json": {
                 "schema": {
@@ -157,7 +190,9 @@ module.exports.API =  {
         }
       },
       "post": {
-        "summary": "Create a new token",
+        "tags": ["Tokens"],
+        "summary": "Create a Token",
+        "description": "Create a new token",
         "headers": {
           "Authorization": {
             "description": "The number of allowed requests in the current period",
@@ -228,7 +263,9 @@ module.exports.API =  {
         }
       },
       "put": {
-        "summary": "Update an existing token",
+        "tags": ["Tokens"],
+        "summary": "Update a Token",
+        "description": "Update a token by the token itself",
         "responses": {
           "200": {
             "description": "Token updated"
@@ -236,17 +273,21 @@ module.exports.API =  {
         }
       },
       "delete": {
-        "summary": "Delete a token",
+        "tags": ["Tokens"],
+        "summary": "Delete a Token by Auth",
+        "description": "Delete a token by the token itself",
         "responses": {
           "204": {
-            "description": "Token deleted"
+            "description": "Token Deleted Response"
           }
         }
       }
     },
     "/-/npm/v1/tokens/token/{uuid}": {
       "delete": {
-        "summary": "Delete a token by UUID",
+        "tags": ["Tokens"],
+        "summary": "Delete a Token by UUID",
+        "description": "Delete a token by the token UUID",
         "parameters": [
           {
             "in": "path",
@@ -264,9 +305,10 @@ module.exports.API =  {
         }
       }
     },
-    "/{scope}/{pkg}/-/{tarball}": {
+    "/{package-name}/-/{tarball}": {
       "get": {
-        "summary": "Get package tarball",
+        "tags": ["Packages"],
+        "summary": "Get Package Tarball",
         "parameters": [
           {
             "in": "path",
@@ -278,7 +320,7 @@ module.exports.API =  {
           },
           {
             "in": "path",
-            "name": "pkg",
+            "name": "package-name",
             "required": true,
             "schema": {
               "type": "string"
@@ -303,9 +345,10 @@ module.exports.API =  {
         }
       }
     },
-    "/{scope}/{pkg}/{version}": {
+    "/{package-name}/{version}": {
       "get": {
-        "summary": "Get package manifest by version",
+        "tags": ["Packages"],
+        "summary": "Get Package Manifest",
         "parameters": [
           {
             "in": "path",
@@ -317,7 +360,7 @@ module.exports.API =  {
           },
           {
             "in": "path",
-            "name": "pkg",
+            "name": "package-name",
             "required": true,
             "schema": {
               "type": "string"
@@ -342,9 +385,10 @@ module.exports.API =  {
         }
       }
     },
-    "/{scope}/{pkg}": {
+    "/{package-name}": {
       "get": {
-        "summary": "Get package packument",
+        "tags": ["Packages"],
+        "summary": "Get Package Packument",
         "parameters": [
           {
             "in": "path",
@@ -356,7 +400,7 @@ module.exports.API =  {
           },
           {
             "in": "path",
-            "name": "pkg",
+            "name": "package-name",
             "required": true,
             "schema": {
               "type": "string"
@@ -373,7 +417,8 @@ module.exports.API =  {
         }
       },
       "put": {
-        "summary": "Publish a package",
+        "tags": ["Packages"],
+        "summary": "Publish Package",
         "parameters": [
           {
             "in": "path",
@@ -385,7 +430,7 @@ module.exports.API =  {
           },
           {
             "in": "path",
-            "name": "pkg",
+            "name": "package-name",
             "required": true,
             "schema": {
               "type": "string"
