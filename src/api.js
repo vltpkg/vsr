@@ -5,12 +5,21 @@ module.exports.API = {
     "title": `vlt serverless registry`,
     "version": version,
     "description": `
-  The **vlt serverless registry** is a "npm-compatible" registry which replicates core features & functionality of \`registry.npmjs.org\` while adding net-new capabilities.
+  The **vlt serverless registry** is a _"npm compatible"_ JavaScript package registry which replicates core features & functionality of **\`registry.npmjs.org\`** while also introducing net-new capabilities.
 
-  ## Supported Clients
+  ## Compatible Clients
 
   <table>
-    <tr><td><img src="" />></td><td>npm</td></tr>
+    <tbody>
+      <tr>
+        <td><a href="https://vlt.sh" title="vlt"><strong><code>vlt</code></strong></a></td>
+        <td><a href="https://npmjs.com/package/npm" title="npm"><strong><code>npm</code></strong></a></td>
+        <td><a href="https://yarnpkg.com/" title="yarn"><strong><code>yarn</code></strong></a></td>
+        <td><a href="https://pnpm.io/" title="pnpm"><strong><code>pnpm</code></strong></a></td>
+        <td><a href="https://deno.com/" title="deno"><strong><code>deno</code></strong></a></td>
+        <td><a href="https://bun.sh/" title="bun"><strong><code>bun</code></strong></a></td>
+      </tr>
+    </tbody>
   </table>
 
   ## Resources
