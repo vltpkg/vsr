@@ -1,7 +1,12 @@
 {
   "name": "vsr",
   "version": "0.1.1",
-  "private": true,
+  "license": "FSL-1.1-MIT",
+  "author": "vlt technology inc. <support@vlt.sh> (http://vlt.sh)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vltpkg/vsr.git"
+  },
   "bin": {
     "vsr": "vsr"
   },

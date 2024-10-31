@@ -8,7 +8,7 @@ module.exports.API = {
     "license": {
       "identifier": "FSL-1.1-MIT",
       "name": "Functional Source License, Version 1.1, MIT Future License",
-      "url": ""
+      "url": "https://fsl.software/FSL-1.1-MIT.template.md"
     },
     "description": `
   The **vlt serverless registry** is a npm compatible JavaScript package registry which replicates core features & functionality of **\`registry.npmjs.org\`** while also introducing net-new capabilities.
