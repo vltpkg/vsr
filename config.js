@@ -220,23 +220,39 @@ export const API_DOCS = {
 .introduction-description table a:hover {
   transform: scale(1.25) !important;
 }
-.introduction-description table a[title="vlt"] {
+.introduction-description table a[alt="vlt"] {
   background-image: url('${IMAGES_VLT}') !important;
 }
-.introduction-description table a[title="npm"] {
+.introduction-description table a[alt="npm"] {
   background-image: url('${IMAGES_NPM}') !important;
 }
-.introduction-description table a[title="yarn"] {
+.introduction-description table a[alt="yarn"] {
   background-image: url('${IMAGES_YARN}') !important;
 }
-.introduction-description table a[title="pnpm"] {
+.introduction-description table a[alt="pnpm"] {
   background-image: url('${IMAGES_PNPM}') !important;
 }
-.introduction-description table a[title="deno"] {
+.introduction-description table a[alt="deno"] {
   background-image: url('${IMAGES_DENO}') !important;
 }
-.introduction-description table a[title="bun"] {
+.introduction-description table a[alt="bun"] {
   background-image: url('${IMAGES_BUN}') !important;
+}
+[alt=resources],
+[alt=trademark-disclaimer],
+[alt=license],
+[alt=license] summary {
+  font-size: 12px !important;
+  line-height: 180% !important;
+}
+[alt=license] {
+  padding: 5px 20px !important;
+  font-family: courier !important;
+}
+[alt=license] summary {
+  padding: 0 0 0 20px !important;
+  margin: 0 0 0 -20px !important;
+  font-family: Inter, -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
 }
   `
 }

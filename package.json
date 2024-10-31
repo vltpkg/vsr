@@ -9,7 +9,7 @@
     "setup": "wrangler d1 execute vsr --local --file ./db/setup.sql",
     "drop": "wrangler d1 execute vsr --local --file ./db/drop.sql",
     "migrate": "wrangler d1 migrations apply vsr --local",
-    "dev": "wrangler dev --persist-to localstore",
+    "dev": "wrangler dev --persist-to local-store",
     "deploy": "wrangler deploy",
     "build": "NODE_NO_WARNINGS=1 node ./scripts/build.mjs",
     "lint": "prettier ."
