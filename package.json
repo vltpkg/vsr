@@ -6,8 +6,8 @@
     "vsr": "vsr"
   },
   "scripts": {
-    "setup": "wrangler d1 execute vsr --local --file ./db/setup.sql",
-    "drop": "wrangler d1 execute vsr --local --file ./db/drop.sql",
+    "setup": "wrangler d1 execute vsr --local --file ./src/db/setup.sql",
+    "drop": "wrangler d1 execute vsr --local --file ./src/db/drop.sql",
     "migrate": "wrangler d1 migrations apply vsr --local",
     "dev": "wrangler dev --persist-to local-store",
     "deploy": "wrangler deploy",
