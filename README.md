@@ -328,4 +328,4 @@ registry=https://registry.example.com
 
 ### License
 
-This project is licensed under the [Fair Core License](https://fcl.dev/) ([**FCL-1.0-MIT**](LICENSE.md)).
+This project is licensed under the [Functional Source License](https://fsl.software) ([**FSL-1.1-MIT**](LICENSE.md)).
