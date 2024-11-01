@@ -11,13 +11,14 @@
     "vsr": "vsr"
   },
   "scripts": {
-    "setup": "wrangler d1 execute vsr --local --file ./src/db/setup.sql",
-    "drop": "wrangler d1 execute vsr --local --file ./src/db/drop.sql",
-    "migrate": "wrangler d1 migrations apply vsr --local",
-    "dev": "wrangler dev --persist-to local-store",
+    "setup": "wrangler d1 execute vsr_local_database --file ./src/db/setup.sql --local --persist-to local-store",
+    "drop": "wrangler d1 execute vsr_local_database --file ./src/db/drop.sql --local --persist-to local-store",
+    "migrate": "wrangler d1 migrations apply vsr_local_database  --local --persist-to local-store",
+    "dev": "wrangler dev --local --persist-to local-store",
     "deploy": "wrangler deploy",
     "build": "NODE_NO_WARNINGS=1 node ./scripts/build.mjs",
-    "lint": "prettier ."
+    "lint": "prettier .",
+    "postinstall": "npm run setup"
   },
   "devDependencies": {
     "libnpmpack": "^7.0.4",

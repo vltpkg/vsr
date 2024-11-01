@@ -217,6 +217,9 @@ export const API_DOCS = {
   background-repeat: no-repeat !important;
   transition: transform 0.25s !important;
 }
+.dark-mode .introduction-description table a {
+  filter: invert(1) !important;
+}
 .introduction-description table a:hover {
   transform: scale(1.25) !important;
 }

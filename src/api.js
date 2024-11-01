@@ -294,7 +294,7 @@ SOFTWARE.
                         "scope": [
                           {
                             "values": [
-                              "@gsap/*"
+                              "*"
                             ],
                             "types": {
                               "pkg": {
@@ -350,7 +350,7 @@ SOFTWARE.
                 "example": {
                   "scope": [
                     {
-                      "values": ["@gsap/premium"],
+                      "values": ["*"],
                       "types": { "pkg": { "read": true, "write": false }}
                     }
                   ]
@@ -372,7 +372,7 @@ SOFTWARE.
                     "scope": [
                       {
                         "values": [
-                          "@gsap/premium"
+                          "*"
                         ],
                         "types": {
                           "pkg": {
