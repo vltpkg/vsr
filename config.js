@@ -67,7 +67,8 @@ export const API_DOCS = {
     ocaml: true,
     curl: false,
     http: true,
-    php: ['http1', 'http2', 'curl'],
+    /* php: ['http1', 'http2', 'curl'],*/
+    php: true
   },
   spec: {
     content: API
@@ -240,6 +241,9 @@ export const API_DOCS = {
 }
 .introduction-description table a[alt="bun"] {
   background-image: url('${IMAGES_BUN}') !important;
+}
+.scalar-app .markdown [alt=license] summary:after {
+  top: 2px;
 }
 [alt=resources],
 [alt=trademark-disclaimer],

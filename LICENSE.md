@@ -6,7 +6,7 @@ FSL-1.1-MIT
 
 ## Notice
 
-Copyright ${year} ${licensor name}
+Copyright 2024 vlt technology inc.
 
 ## Terms and Conditions
 
