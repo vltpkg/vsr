@@ -162,7 +162,7 @@ SOFTWARE.
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "Bearer <token>"
+        "bearerFormat": "Bearer <token>",
       }
     }
   },
@@ -245,9 +245,6 @@ SOFTWARE.
           }
         }
       }
-    },
-    "/-/docs": {
-      "$ref": "#/paths/~1"
     },
     "/-/whoami": {
       "get": {

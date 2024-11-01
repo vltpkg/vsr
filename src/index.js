@@ -45,7 +45,11 @@ app.use(prettyJSON({ space: 2 }))
 
 function isPrivate(c) {
   const { path } = c.req
-  return !!(path === '/' || path.startsWith('/-/docs') || path.startsWith('/images'))
+  const routes = [
+    '/images',
+    '/styles'
+  ]
+  return path === '/' || !!routes.filter(r => path.startsWith(r)).length
 }
 
 async function proxyRoute (c) {
@@ -68,7 +72,6 @@ if (PROXIES) {
 
 // GET scalar API reference
 app.get('/', apiReference(API_DOCS))
-app.get('/-/docs', apiReference(API_DOCS))
 
 // GET /-/ping
 app.get('/-/ping', (c) => c.json({}, 200))

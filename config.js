@@ -46,12 +46,14 @@ export const API_DOCS = {
     http: {
       bearer: {
         token: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+      },
+      basic: {
+        username: "user",
+        password: "pass"
       }
     }
   },
   hiddenClients: {
-    node: ['axios', 'native', 'undici', 'request', 'unirest'],
-    javascript: ['axios', 'xhr', 'jquery'],
     python: true,
     c: true,
     go: true,
@@ -68,8 +70,9 @@ export const API_DOCS = {
     ocaml: true,
     curl: false,
     http: true,
-    /* php: ['http1', 'http2', 'curl'],*/
-    php: true
+    php: true,
+    node: ['axios', 'native', 'fetch', 'request', 'unirest'],
+    javascript: ['axios', 'xhr', 'jquery']
   },
   spec: {
     content: API
