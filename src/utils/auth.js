@@ -61,10 +61,6 @@ export function parseTokenAccess ({scope, pkg, uuid}) {
   return temp
 }
 
-export function isDocs (path) {
-  return path === '/' || path.startsWith('/-/docs')
-}
-
 export function isUserRoute (path) {
   const routes = [
     'ping',
@@ -97,11 +93,6 @@ export async function getAuthedUser ({ c, token }) {
 export async function verifyToken (token, c) {
 
   const method = c.req.method ? c.req.method.toLowerCase() : ''
-
-  // return early for docs
-  if (isDocs(c.req.path)) {
-    return true
-  }
 
   // return early for fetching gsap react
   if (method === 'get' && c.req.path.startsWith('/@gsap/react')) {

@@ -2,13 +2,13 @@
 import { API } from './src/api.js'
 
 // get logos
-import IMAGES_VLT from './src/assets/images/vlt.js'
-import IMAGES_NPM from './src/assets/images/npm.js'
-import IMAGES_YARN from './src/assets/images/yarn.js'
-import IMAGES_PNPM from './src/assets/images/pnpm.js'
-import IMAGES_DENO from './src/assets/images/deno.js'
-import IMAGES_BUN from './src/assets/images/bun.js'
-import IMAGES_BG from './src/assets/images/bg.js'
+import IMAGES_VLT from './src/assets/images/clients/vlt.js'
+import IMAGES_NPM from './src/assets/images/clients/npm.js'
+import IMAGES_YARN from './src/assets/images/clients/yarn.js'
+import IMAGES_PNPM from './src/assets/images/clients/pnpm.js'
+import IMAGES_DENO from './src/assets/images/clients/deno.js'
+import IMAGES_BUN from './src/assets/images/clients/bun.js'
+import IMAGES_BG from './src/assets/images/clients/bg.js'
 
 // the packages to proxy
 export const PROXIES = []
@@ -37,6 +37,7 @@ export const API_DOCS = {
   hideModels: false,
   hideDownloadButton: false,
   darkMode: false,
+  favicon: '/images/favicon/favicon.svg',
   defaultHttpClient: {
     targetKey: 'curl',
     clientKey: 'fetch',

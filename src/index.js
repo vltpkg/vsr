@@ -6,6 +6,7 @@ import { Hono } from 'hono'
 import { requestId } from 'hono/request-id'
 import { bearerAuth } from 'hono/bearer-auth'
 import { prettyJSON } from 'hono/pretty-json'
+import { except } from 'hono/combine'
 import { apiReference } from '@scalar/hono-api-reference'
 import { secureHeaders } from 'hono/secure-headers'
 import { trimTrailingSlash } from 'hono/trailing-slash'
@@ -24,7 +25,7 @@ import {
 } from './routes/packages'
 
 // Hono instance
-const app = new Hono({ strict: true })
+const app = new Hono({ strict: false })
 
 // Trim trailing slash requests
 app.use(trimTrailingSlash())
@@ -39,8 +40,13 @@ app.use(secureHeaders())
 app.use(prettyJSON({ space: 2 }))
 
 // -------------------------
-// Proxied Requests
+// Proxied or Global Requests
 // -------------------------
+
+function isPrivate(c) {
+  const { path } = c.req
+  return !!(path === '/' || path.startsWith('/-/docs') || path.startsWith('/images'))
+}
 
 async function proxyRoute (c) {
   let { ref, version } = packageSpec(c)
@@ -63,18 +69,16 @@ if (PROXIES) {
 // GET scalar API reference
 app.get('/', apiReference(API_DOCS))
 app.get('/-/docs', apiReference(API_DOCS))
-app.get('/-/docs/', apiReference(API_DOCS))
 
 // GET /-/ping
 app.get('/-/ping', (c) => c.json({}, 200))
-app.get('/-/ping/', (c) => c.json({}, 200))
 
 // -------------------------
 // Authorization
 // -------------------------
 
 // Verify token
-app.use('*', bearerAuth({ verifyToken }))
+app.use('*', except(isPrivate, bearerAuth({ verifyToken })))
 
 // -------------------------
 // Users / Authentication
@@ -82,11 +86,9 @@ app.use('*', bearerAuth({ verifyToken }))
 
 // GET a user profile
 app.get('/-/whoami', getUsername)
-app.get('/-/whoami/', getUsername)
 
 // GET /-/npm/v1/user
 app.get('/-/npm/v1/user', getUserProfile)
-app.get('/-/npm/v1/user/', getUserProfile)
 
 // -------------------------
 // Tokens
@@ -94,42 +96,26 @@ app.get('/-/npm/v1/user/', getUserProfile)
 
 // GET a token profile (checked)
 app.get('/-/npm/v1/tokens', getToken)
-app.get('/-/npm/v1/tokens/', getToken)
 
 // POST a new token
 app.post('/-/npm/v1/tokens', postToken)
-app.post('/-/npm/v1/tokens/', postToken)
-
 
 // PUT an existing token
 app.put('/-/npm/v1/tokens', putToken)
-app.put('/-/npm/v1/tokens/', putToken)
 
 // DELETE a new token
 app.delete('/-/npm/v1/tokens/token/:token', deleteToken)
-app.delete('/-/npm/v1/tokens/token/:token/', deleteToken)
 
 // -------------------------
 // Packages
 // -------------------------
 
 app.get('/:scope/:pkg/-/:tarball', getPackageTarball)
-app.get('/:scope/:pkg/-/:tarball/', getPackageTarball)
-
 app.get('/:scope/:pkg/:version', getPackageManifest)
-app.get('/:scope/:pkg/:version/', getPackageManifest)
-
 app.get('/:scope/:pkg', getPackagePackument)
-app.get('/:scope/:pkg/', getPackagePackument)
-
 app.put('/:scope/:pkg', publishPackage)
-app.put('/:scope/:pkg/', publishPackage)
-
 app.get('/:pkg', getPackagePackument)
-app.get('/:pkg/', getPackagePackument)
-
 app.put('/:pkg', publishPackage)
-app.put('/:pkg/', publishPackage)
 
 // -------------------------
 // Fallbacks
