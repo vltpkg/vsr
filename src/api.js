@@ -1,7 +1,19 @@
-const YEAR = new Date().getFullYear();
-const { version } = require('../package.json');
+const { version } = require('../package.json')
+const { dev } = require('../wrangler.json')
+const YEAR = new Date().getFullYear()
+
 module.exports.API = {
   "openapi": "3.1.0",
+  "servers": [
+    {
+      "url": `http://localhost:${dev.port}`,
+      "description": "local"
+    },
+    {
+      "url": "https://registry.npmjs.org",
+      "description": "npm public registry"
+    }
+  ],
   "info": {
     "title": `vlt serverless registry`,
     "version": version,

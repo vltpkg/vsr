@@ -48,8 +48,8 @@ export const API_DOCS = {
         token: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
       },
       basic: {
-        username: "user",
-        password: "pass"
+        username: 'user',
+        password: 'pass'
       }
     }
   },
@@ -66,13 +66,13 @@ export const API_DOCS = {
     objc: true,
     swift: true,
     r: true,
-    powershell: true,
+    powershell: false,
     ocaml: true,
     curl: false,
     http: true,
-    php: true,
-    node: ['axios', 'native', 'fetch', 'request', 'unirest'],
-    javascript: ['axios', 'xhr', 'jquery']
+    php: false,
+    node: ['request', 'unirest'],
+    javascript: ['xhr', 'jquery']
   },
   spec: {
     content: API
