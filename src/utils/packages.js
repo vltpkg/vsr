@@ -1,6 +1,7 @@
 import { DOMAIN } from '../../config.js'
 import { Buffer } from 'node:buffer'
 import { extract } from 'streaming-tarball'
+import getNpmTarballUrl from 'get-npm-tarball-url'
 import semver from 'semver'
 
 export async function extractPackageJSON (buffer) {
@@ -44,8 +45,8 @@ export function packageSpec (c) {
   }
 }
 
-export function createFile ({ ref, pkg, version }) {
-  return `${pkg}/-/${ref}-${version}.tgz`
+export function createFile ({ pkg, version }) {
+  return (new URL(getNpmTarballUrl(pkg, version))).pathname.slice(1)
 }
 
 // ex. unscoped https://registry.npmjs.org/axios/-/axios-1.0.0.tgz
@@ -60,7 +61,7 @@ export function createVersion ({ ref, pkg, version, manifest }) {
     'bin'
   ]
   Object.keys(manifest).filter(key => !keep.includes(key)).forEach(key => delete manifest[key])
-  const file = createFile({ ref, pkg, version })
+  const file = createFile({ pkg, version })
   const temp = {
     name: pkg,
     version,

@@ -9,13 +9,15 @@ import {
   createFile,
   createVersion
 } from '../utils/packages'
+import getNpmTarballUrl from 'get-npm-tarball-url'
 
 export async function getPackageTarball (c) {
   const { tarball } = c.req.param()
-  const { scope } = packageSpec(c)
+  const { pkg, version } = packageSpec(c)
   c.header('Content-Type', 'application/octet-stream')
   c.status(200)
-  const filename = `${scope}/${tarball}`
+  const filename = createFile({ pkg, version })
+  console.log('filename', filename)
   const file = await c.env.BUCKET.get(filename)
   if (!file) {
     return c.json({ error: 'Not found' }, 404)
@@ -34,6 +36,9 @@ export async function getPackageManifest (c) {
   if (version === 'latest') {
     const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
     const packument = await c.env.DB.prepare(packumentQuery).run()
+    if (!packument.results.length) {
+      return c.json({ error: 'Not found' }, 404)
+    }
     version = JSON.parse(packument.results[0].tags).latest
   }
   const versionsQuery = `SELECT * FROM versions WHERE spec = "${pkg}@${version}"`
@@ -65,11 +70,16 @@ export async function getPackagePackument (c) {
   const isCorgi = accept === corgi
   const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
   const packument = await c.env.DB.prepare(packumentQuery).run()
+
+  if (!packument.results.length) {
+    c.json({ error: 'Package not found' }, 404)
+  }
+
   const latest = JSON.parse(packument.results[0].tags).latest
   const versionsQuery = `SELECT * FROM versions WHERE spec LIKE "${pkg}@%"`
   const versions = await c.env.DB.prepare(versionsQuery).run()
   if (!versions.results.length) {
-    c.json({ error: 'Not found' }, 404)
+    c.json({ error: 'Versions not found' }, 404)
   }
 
   const ret = {
@@ -106,6 +116,11 @@ export async function publishPackage (c) {
   const versions = (!results.length) ? results.filter(r => r.version) : []
   const new_versions = Object.keys(body.versions).filter(v => !versions.includes(v))
 
+  if (!results || results.length === 0) {
+    const insertQuery = `INSERT INTO packages (name, tags) VALUES ("${pkg}", json('{"latest": "${new_versions[0]}"}'))`
+    await c.env.DB.prepare(insertQuery).run()
+  }
+
   // check for conflicts in publishing vs. existing
   if (!new_versions.length) {
     return c.json({ error: 'Nothing to publish' }, 409)
@@ -121,7 +136,7 @@ export async function publishPackage (c) {
   const manifest = body.versions[version]
 
   // check for deprecation, update existing version & return early
-  if (manifest.hasOwnProperty(deprecated)) {
+  if (manifest.hasOwnProperty('deprecated')) {
     if (manifest.deprecated === '') {
       delete existing.deprecated
     } else {
@@ -167,11 +182,12 @@ export async function publishPackage (c) {
 
   // prioritize package.json values over "manifest" provided values
   // override `dist` as this cannot be trusted from the client
+  console.log('...', createFile({ pkg, version }))
   const store = {
     ...packageJSON,
     ...{
       dist: {
-        tarball: `${DOMAIN}/${createFile({ ref, pkg, version })}`
+        tarball: `${DOMAIN}/${(createFile({ pkg, version }))}`,
       }
     }
   }
@@ -183,6 +199,7 @@ export async function publishPackage (c) {
   try {
     await c.env.DB.prepare(insertQuery).run()
   } catch (err) {
+    console.log('existing package.....', err)
     return c.json({ error: 'Existing Package' }, 409)
   }
 
