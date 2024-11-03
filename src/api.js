@@ -463,86 +463,6 @@ SOFTWARE.
         }
       }
     },
-    "/{package-name}/-/{tarball}": {
-      "get": {
-        "tags": ["Packages"],
-        "summary": "Get Package Tarball",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "scope",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "package-name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "tarball",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Package tarball"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/{package-name}/{version}": {
-      "get": {
-        "tags": ["Packages"],
-        "summary": "Get Package Manifest",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "scope",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "package-name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "version",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Package manifest"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
     "/{package-name}": {
       "get": {
         "tags": ["Packages"],
@@ -615,6 +535,86 @@ SOFTWARE.
           },
           "409": {
             "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/{package-name}/{version}": {
+      "get": {
+        "tags": ["Packages"],
+        "summary": "Get Package Manifest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package manifest"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/{package-name}/-/{tarball}": {
+      "get": {
+        "tags": ["Packages"],
+        "summary": "Get Package Tarball",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tarball",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package tarball"
+          },
+          "404": {
+            "description": "Not found"
           }
         }
       }

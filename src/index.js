@@ -18,7 +18,9 @@ import { getToken, putToken, postToken, deleteToken } from './routes/tokens'
 import { packageSpec } from './utils/packages'
 
 import {
-  getPackage,
+  getPackageManifest,
+  getPackagePackument,
+  getPackageTarball,
   publishPackage,
 } from './routes/packages'
 
@@ -78,6 +80,13 @@ app.get('/-/ping', (c) => c.json({}, 200))
 // Authorization
 // -------------------------
 
+app.get('/:scope/:pkg', getPackagePackument)
+app.get('/:scope/:pkg/:version', getPackageManifest)
+app.get('/:scope/:pkg/-/:pkg-:version.tgz', getPackageTarball)
+app.get('/:pkg/:version', getPackageManifest)
+app.get('/:pkg/-/:pkg-:version.tgz', getPackageTarball)
+app.get('/:pkg', getPackagePackument)
+
 // Verify token
 app.use('*', except(isPrivate, bearerAuth({ verifyToken })))
 
@@ -112,8 +121,6 @@ app.delete('/-/npm/v1/tokens/token/:token', deleteToken)
 // -------------------------
 
 app.put('/:scope/:pkg', publishPackage)
-app.get('/:pkg', getPackage)
-app.get('/:pkg/:version', getPackage)
 app.put('/:pkg', publishPackage)
 
 // -------------------------

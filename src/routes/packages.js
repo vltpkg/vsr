@@ -11,8 +11,8 @@ import {
 } from '../utils/packages'
 
 export async function getPackageTarball (c) {
-  const { tarball } = c.req.param()
-  const { pkg, version } = packageSpec(c)
+  let { scope, pkg, version } = c.req.param()
+  pkg = scope ? `${scope}/${pkg}` : pkg
   c.header('Content-Type', 'application/octet-stream')
   c.status(200)
   const filename = createFile({ pkg, version })
@@ -25,7 +25,7 @@ export async function getPackageTarball (c) {
 }
 
 export async function getPackageManifest (c) {
-  let { pkg, ref, version } = packageSpec(c)
+  let { version, pkg } = packageSpec(c)
   if (!pkg) {
     return c.json({ error: 'Not found' }, 404)
   } else if (!version) {
@@ -40,7 +40,6 @@ export async function getPackageManifest (c) {
     }
     version = JSON.parse(packument.results[0].tags).latest
   }
-  console.log(`${pkg}@${version}`)
   const versionsQuery = `SELECT * FROM versions WHERE spec = "${pkg}@${version}"`
   const versions = await c.env.DB.prepare(versionsQuery).run()
 
@@ -59,30 +58,18 @@ export async function getPackageManifest (c) {
   return c.json(ret, 200)
 }
 
-export async function getPackage (c) {
-  const { pkg } = packageSpec(c)
-  const parts = c.req.path.split('/').length - 1
-  if (!pkg) {
-    return c.json({ error: 'Not found' }, 404)
-  }
+export async function getPackagePackument (c) {
+  let { pkg, scope } = c.req.param()
+  const isScoped = scope && scope.startsWith('@')
+  const verionIndex = isScoped ? 4 : 3
+  const isVersioned = c.req.path.split('/').length === verionIndex
+  pkg = isScoped ? `${scope}/${pkg}` : scope || pkg
 
-  console.log(parts)
-
-  if (parts === 1) {
-    return getPackagePackument(c)
-  }
-
-  if (parts > 1 && parts < 4) {
+  // fetch manifest of unscoped packages if that's what is passed
+  if (pkg && isVersioned) {
     return getPackageManifest(c)
   }
 
-  if (parts >= 4) {
-    return getPackageTarball(c)
-  }
-}
-
-export async function getPackagePackument (c) {
-  const { pkg, ref } = packageSpec(c)
   const corgi = 'application/vnd.npm.install-v1+json'
   const accept = accepts(c, {
     header: 'Accept-Language',
@@ -93,8 +80,8 @@ export async function getPackagePackument (c) {
   const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
   const packument = await c.env.DB.prepare(packumentQuery).run()
 
-  if (!packument.results.length) {
-    c.json({ error: 'Package not found' }, 404)
+  if (!packument.results || packument.results.length === 0) {
+    return c.json({ error: 'Package not found' }, 404)
   }
 
   const latest = JSON.parse(packument.results[0].tags).latest
@@ -116,7 +103,7 @@ export async function getPackagePackument (c) {
   versions.results.forEach(row => {
     const manifest = JSON.parse(row.manifest)
     const { version } = manifest
-    ret.versions[version] = createVersion({ ref, pkg, version, manifest })
+    ret.versions[version] = createVersion({ pkg, version, manifest })
     ret.time[version] = row.published_at
   })
 
@@ -124,7 +111,7 @@ export async function getPackagePackument (c) {
 }
 
 export async function publishPackage (c) {
-  const { ref, scope, pkg } = packageSpec(c)
+  const { pkg } = packageSpec(c)
   const body = await c.req.json()
 
   // basic validation of body

@@ -51,7 +51,7 @@ export function createFile ({ pkg, version }) {
 
 // ex. unscoped https://registry.npmjs.org/axios/-/axios-1.0.0.tgz
 // ex. scoped https://registry.npmjs.org/@graphql-mesh/cli/-/cli-0.94.1.tgz
-export function createVersion ({ ref, pkg, version, manifest }) {
+export function createVersion ({ pkg, version, manifest }) {
   const keep = [
     'dependencies',
     'devDependencies',
