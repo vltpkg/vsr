@@ -113,7 +113,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ```json
 [
   {
-    "values": ["@gsap/pro"],
+    "values": ["@compabny/pro"],
     "types": {
       "pkg": {
         "read": true,
@@ -138,7 +138,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ```json
 [
   {
-    "values": ["@gsap/*"],
+    "values": ["@company/*"],
     "types": {
       "pkg": {
         "read": true,
@@ -154,7 +154,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ```json
 [
   {
-    "values": ["@gsap/*"],
+    "values": ["@company/*"],
     "types": {
       "pkg": {
         "read": true,

@@ -31,13 +31,6 @@ export async function getPackageManifest (c) {
     return c.json({ error: `Version not found: ${version}` }, 404)
   }
 
-  // return early for fetching gsap react
-  if (pkg === '@gsap/react') {
-    const ret = await fetch(`https://registry.npmjs.org/@gsap/react/${version}`)
-    const json = await ret.json()
-    return c.json(json, 200)
-  }
-
   if (version === 'latest') {
     const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
     const packument = await c.env.DB.prepare(packumentQuery).run()
@@ -59,13 +52,6 @@ export async function getPackageManifest (c) {
 }
 
 export async function getPackagePackument (c) {
-
-  // return early for fetching gsap react
-  if (c.req.path.startsWith('/@gsap/react')) {
-    const ret = await fetch('https://registry.npmjs.org/@gsap/react')
-    const json = await ret.json()
-    return c.json(json, 200)
-  }
 
   const { pkg, ref } = packageSpec(c)
   if (!pkg) {
