@@ -34,7 +34,6 @@ export async function getPackageManifest (c) {
   if (version === 'latest') {
     const packumentQuery = `SELECT * FROM packages WHERE name = "${pkg}"`
     const packument = await c.env.DB.prepare(packumentQuery).run()
-    console.log(packument)
     version = JSON.parse(packument.results[0].tags).latest
   }
   const versionsQuery = `SELECT * FROM versions WHERE spec = "${pkg}@${version}"`
