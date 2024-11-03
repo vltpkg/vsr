@@ -52,37 +52,37 @@ export async function getToken(c) {
 }
 
 export async function postToken(c) {
-  let { scope, uuid } = await c.req.json()
-  if (!scope) {
+  const { uuid: userUuid, scope: userScope, token: userToken } = await getAuthedUser({c})
+  let { scope: providedScope, uuid: providedUuid } = await c.req.json()
+  if (!providedScope) {
     return c.json({ error: 'Missing scope' }, 400)
   }
-  const token = uuidv4()
+  const generatedToken = uuidv4()
 
-  // if uuid starts with "~" then throw
+  // assume if no uuid is provided then the user is making a token for themselves
+  const uuid = providedUuid || userUuid
+
+  // if uuid starts with special characters then throw
   const specialChars = ['~', '!', '*', '^', '&']
   if (specialChars.some(char => uuid.startsWith(char))) {
     return c.json({ error: 'Invalid uuid - uuids can not start with special characters (ex. - ~ ! * ^ &)' }, 400)
   }
 
-  // new tokens that generate a "user" should grant read+write access to themselves
-  scope = scope.push({
-    "values": [`~${uuid}`],
-    "types": {
-      "user": {
-        "read": true,
-        "write": true
-      }
+  // check if user has access to manage this uuid
+  if (uuid != providedUuid) {
+    const { anyUser, specificUser, writeAccess } = parseTokenAccess({ userScope, uuid: providedUuid })
+    if ((!anyUser && !specificUser) || !writeAccess) {
+      return c.json({ error: 'Unauthorized' }, 401)
     }
-  })
-  // TODO: add conditional logic for generating a new token with an existing user
-  // TODO: validate read+write tokens as they're only allowed to be added by privileged users
+  }
+
   try {
-    const query = `INSERT INTO tokens (uuid, token, scope) VALUES ("${uuid}", "${token}", json('${JSON.stringify(scope)}'))`
+    const query = `INSERT INTO tokens (uuid, token, scope) VALUES ("${uuid}", "${generatedToken}", json('${JSON.stringify(providedScope)}'))`
     await c.env.DB.prepare(query).run()
   } catch (e) {
     return c.json({ error: 'Token or user already exists' }, 400)
   }
-  return c.json({ scope, uuid, token })
+  return c.json({ scope: providedScope, uuid, token: generatedToken })
 }
 
 // scope is optional (only for privileged tokens) - ex. "read:@scope/pkg" or "read+write:@scope/pkg"

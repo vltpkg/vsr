@@ -27,6 +27,7 @@
     "ssri": "^10.0.6"
   },
   "dependencies": {
+    "@hono-rate-limiter/cloudflare": "^0.2.1",
     "@scalar/hono-api-reference": "^0.5.158",
     "hono": "^4.5.5",
     "hono-rate-limiter": "^0.4.0",

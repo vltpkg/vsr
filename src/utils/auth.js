@@ -94,11 +94,6 @@ export async function verifyToken (token, c) {
 
   const method = c.req.method ? c.req.method.toLowerCase() : ''
 
-  // return early for fetching gsap react
-  if (method === 'get' && c.req.path.startsWith('/@gsap/react')) {
-    return true
-  }
-
   if (!token) {
     return false
   }

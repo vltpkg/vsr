@@ -1,19 +1,18 @@
 const { version } = require('../package.json')
 const { dev } = require('../wrangler.json')
-const YEAR = new Date().getFullYear()
+const localhost = {
+  "url": `http://localhost:${dev.port}`,
+  "description": "localhost"
+}
+const npm = {
+  "url": "https://registry.npmjs.org",
+  "description": "npm public registry"
+}
+const year = new Date().getFullYear()
 
 module.exports.API = {
   "openapi": "3.1.0",
-  "servers": [
-    {
-      "url": `http://localhost:${dev.port}`,
-      "description": "local"
-    },
-    {
-      "url": "https://registry.npmjs.org",
-      "description": "npm public registry"
-    }
-  ],
+  "servers": [ localhost ],
   "info": {
     "title": `vlt serverless registry`,
     "version": version,
@@ -64,7 +63,7 @@ FSL-1.1-MIT
 
 <h2>Notice</h2>
 
-Copyright ${YEAR} vlt technology inc.
+Copyright ${year} vlt technology inc.
 
 <h2>Terms and Conditions</h2>
 
@@ -357,10 +356,22 @@ SOFTWARE.
               "schema": {
                 "type": "object",
                 "example": {
+                  "uuid": "admin",
                   "scope": [
                     {
                       "values": ["*"],
                       "types": { "pkg": { "read": true, "write": false }}
+                    },
+                    {
+                      "values": [
+                        "~admin"
+                      ],
+                      "types": {
+                        "user": {
+                          "read": true,
+                          "write": true
+                        }
+                      }
                     }
                   ]
                 }
@@ -376,7 +387,7 @@ SOFTWARE.
                 "schema": {
                   "type": "object",
                   "example": {
-                    "uuid": "1ef5f713-15ff-6490-bfbb-f6bb76ecf4c9",
+                    "uuid": "admin",
                     "token": "1ef5f713-15ff-6491-b62d-d16f6f04e6ac",
                     "scope": [
                       {
@@ -392,7 +403,7 @@ SOFTWARE.
                       },
                       {
                         "values": [
-                          "~johnsmith"
+                          "~admin"
                         ],
                         "types": {
                           "user": {
@@ -604,6 +615,147 @@ SOFTWARE.
           },
           "409": {
             "description": "Conflict"
+          }
+        }
+      }
+    }
+  },
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+    },
+    "basicAuth": {
+      "type": "http",
+      "scheme": "basic"
+    },
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-API-Key"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "api_key"
+    },
+    "apiKeyCookie": {
+      "type": "apiKey",
+      "in": "cookie",
+      "name": "api_key"
+    },
+    "oAuth2": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "clientCredentials": {
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "implicit": {
+          "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "password": {
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "planetId": {
+      "name": "planetId",
+      "in": "path",
+      "required": true,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "examples": [
+          1
+        ]
+      }
+    },
+    "limit": {
+      "name": "limit",
+      "in": "query",
+      "description": "The number of items to return",
+      "required": false,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "default": 10
+      }
+    },
+    "offset": {
+      "name": "offset",
+      "in": "query",
+      "description": "The number of items to skip before starting to collect the result set",
+      "required": false,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "default": 0
+      }
+    }
+  },
+  "responses": {
+    "BadRequest": {
+      "description": "Bad Request",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "Forbidden": {
+      "description": "Forbidden",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "NotFound": {
+      "description": "NotFound",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "Unauthorized": {
+      "description": "Unauthorized",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
           }
         }
       }
