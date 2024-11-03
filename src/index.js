@@ -18,9 +18,7 @@ import { getToken, putToken, postToken, deleteToken } from './routes/tokens'
 import { packageSpec } from './utils/packages'
 
 import {
-  getPackageTarball,
-  getPackagePackument,
-  getPackageManifest,
+  getPackage,
   publishPackage,
 } from './routes/packages'
 
@@ -113,11 +111,9 @@ app.delete('/-/npm/v1/tokens/token/:token', deleteToken)
 // Packages
 // -------------------------
 
-app.get('/:scope/:pkg/-/:tarball', getPackageTarball)
-app.get('/:scope/:pkg/:version', getPackageManifest)
-app.get('/:scope/:pkg', getPackagePackument)
 app.put('/:scope/:pkg', publishPackage)
-app.get('/:pkg', getPackagePackument)
+app.get('/:pkg', getPackage)
+app.get('/:pkg/:version', getPackage)
 app.put('/:pkg', publishPackage)
 
 // -------------------------

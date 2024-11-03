@@ -2,14 +2,13 @@ import { Buffer } from 'node:buffer'
 import validate from 'validate-npm-package-name'
 import semver from 'semver'
 import { accepts } from 'hono/accepts'
-import { SCOPE, DOMAIN } from '../../config'
+import { DOMAIN } from '../../config'
 import {
   extractPackageJSON,
   packageSpec,
   createFile,
   createVersion
 } from '../utils/packages'
-import getNpmTarballUrl from 'get-npm-tarball-url'
 
 export async function getPackageTarball (c) {
   const { tarball } = c.req.param()
@@ -41,26 +40,49 @@ export async function getPackageManifest (c) {
     }
     version = JSON.parse(packument.results[0].tags).latest
   }
+  console.log(`${pkg}@${version}`)
   const versionsQuery = `SELECT * FROM versions WHERE spec = "${pkg}@${version}"`
   const versions = await c.env.DB.prepare(versionsQuery).run()
 
-  if (!versions.results.length) {
-    c.json({ error: 'Not found' }, 404)
+  if (!versions.results || versions.results.length === 0) {
+    return c.json({ error: 'Not found' }, 404)
   }
 
   const row = versions.results[0]
   const manifest = JSON.parse(row.manifest)
-  const ret = { ...manifest, ...createVersion({ ref, pkg, version, manifest }) }
+  const ret = { ...manifest, ...{
+    dist: {
+      tarball: `${DOMAIN}/${createFile({ pkg, version })}`
+    }
+  }}
 
   return c.json(ret, 200)
 }
 
-export async function getPackagePackument (c) {
-
-  const { pkg, ref } = packageSpec(c)
+export async function getPackage (c) {
+  const { pkg } = packageSpec(c)
+  const parts = c.req.path.split('/').length - 1
   if (!pkg) {
     return c.json({ error: 'Not found' }, 404)
   }
+
+  console.log(parts)
+
+  if (parts === 1) {
+    return getPackagePackument(c)
+  }
+
+  if (parts > 1 && parts < 4) {
+    return getPackageManifest(c)
+  }
+
+  if (parts >= 4) {
+    return getPackageTarball(c)
+  }
+}
+
+export async function getPackagePackument (c) {
+  const { pkg, ref } = packageSpec(c)
   const corgi = 'application/vnd.npm.install-v1+json'
   const accept = accepts(c, {
     header: 'Accept-Language',
