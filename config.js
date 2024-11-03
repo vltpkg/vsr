@@ -21,7 +21,7 @@ export const SCOPE_PACKAGES = false
 export const SCOPE = ''
 
 // the global scope/glob pattern for all packages
-export const ANY_PACKAGE_SPEC = `${SCOPE}/*`
+export const ANY_PACKAGE_SPEC = '*'
 
 // the domain the registry is hosted on
 export const DOMAIN = 'http://localhost'

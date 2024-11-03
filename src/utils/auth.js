@@ -20,13 +20,8 @@ export function parseTokenAccess ({scope, pkg, uuid}) {
     readAccess: false,
     writeAccess: false
   }
-  // this is custom business logic for gsap
-  const alternates = {
-    shockingly: 'premium',
-    premium: 'shockingly',
-    simply: 'pro',
-    pro: 'simply'
-  }
+  // TODO: add for multiple package access/aliases ib scopes
+  const alternates = {}
   scope.map(s => {
     if (s.types.pkg) {
       if (s.values.includes(ANY_PACKAGE_SPEC)) {

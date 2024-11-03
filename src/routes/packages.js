@@ -101,11 +101,6 @@ export async function publishPackage (c) {
     return c.json({ error: 'Invalid request' }, 400)
   }
 
-  // check scope
-  if (!scope || scope !== SCOPE) {
-    return c.json({ error: 'Invalid scope' }, 400)
-  }
-
   // query for existing packages (if none, then this is a new package)
   const query = `SELECT * FROM versions WHERE spec LIKE "${pkg}@%"`
   const { results } = await c.env.DB.prepare(query).run()
