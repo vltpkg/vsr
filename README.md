@@ -176,69 +176,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 
 ### Documentation
 
-#### `GET /@<org>/<package>/`
-- Returns all published packages metadata for the specific package name
-- TTL: ~5min
-
-#### `GET /@<org>/<package>/<version|dist-tag>`
-- Returns full package manifest for specific version
-- TTL: ~1yr for versions
-- TTL: ~5min for dist-tags
-
-#### `POST /@<org>/<package>/`
-- Publish
-
-#### `GET /-/whoami`
-- Returns username associated with auth token
-
-```
-$ npm whoami
-darcyclarke
-```
-
-#### `GET /-/npm/v1/user`
-- Returns profile object associated with auth token
-
-```
-$ npm profile
-name: darcyclarke
-created: 2015-02-26T01:26:01.124Z
-updated: 2023-01-10T21:55:32.118Z
-```
-
-#### `PUT /-/org/@<org>/<user>`
-- Adds/updates a user (requires admin privileges)
-
-#### `PUT /-/npm/v1/user`
-- Updates a user (requires auth)
-
-#### `GET /-/npm/v1/tokens`
-- Get tokens for the associative authenticated user
-
-```
-$ npm token list
-
-<token-type> token <partial-token>… with id <uuid> created <date-created>
-```
-
-#### `POST /-/npm/v1/tokens/`
-
-- Creates a token for configured user (requires admin priveleges)
-
-```
-$ npm token create
-....
-```
-
-#### `DELETE /-/npm/v1/tokens/token/<token>`
-- Revokes a token for the associative authenticated user
-
-```
-$ npm token revoke <token>
-```
-
-#### `DELETE /-/npm/v1/user/<uuid>`
-- Deletes a user (requires admin privileges)
+We have rich, interactive API docs out-of-the-box with the help of our friends [Scalar](https://scalar.com/). The docs can be found at the registry root when running `vsr` locally (ex. run `npx vltpkg/vsr` &/or check out this repo & run `npm run dev`)
 
 ### `npm` Client Compatibility
 
@@ -262,7 +200,7 @@ registry=https://registry.example.com
 | ❌ | `access set mfa` |
 | ❌ | `access grant` |
 | ❌ | `access revoke` |
-| ❌ | `adduser` |
+| 🕤 | `adduser` - `PUT /-/org/@<org>/<user>`: Adds/updates a user (requires admin privileges) |
 | ❌ | `audit` |
 | ✅ | `bugs` |
 | ❌ | `dist-tag add` |
@@ -284,7 +222,7 @@ registry=https://registry.example.com
 | ❌ | `profile enable-2fa` |
 | ❌ | `profile disable-2fa` |
 | ✅ | `profile get` |
-| ❌ | `profile set` |
+| 🕤 | `profile set` - `PUT /-/npm/v1/user`: Updates a user (requires auth) |
 | ✅ | `publish` |
 | ✅ | `repo` |
 | ❌ | `search` |

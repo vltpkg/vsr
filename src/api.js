@@ -205,7 +205,13 @@ SOFTWARE.
       "get": {
         "tags": ["Users"],
         "summary": "Get User Profile",
-        "description": "Get the user profile",
+        "description": `Returns profile object associated with auth token
+\`\`\`bash
+$ npm profile
+name: johnsmith
+created: 2015-02-26T01:26:01.124Z
+updated: 2023-01-10T21:55:32.118Z
+\`\`\``,
         "responses": {
           "200": {
             "description": "User Profile",
@@ -227,7 +233,12 @@ SOFTWARE.
       "get": {
         "tags": ["Misc."],
         "summary": "Ping",
-        "description": "Check if the server is alive",
+        "description": `Check if the server is alive
+\`\`\`bash
+$ npm ping
+npm notice PING http://localhost:1337/
+npm notice PONG 13ms
+\`\`\``,
         "security": [],
         "responses": {
           "200": {
@@ -261,7 +272,11 @@ SOFTWARE.
       "get": {
         "tags": ["Users"],
         "summary": "Get User Username",
-        "description": "Get a user's username",
+        "description": `Returns username associated with auth token
+\`\`\`bash
+$ npm whoami
+johnsmith
+\`\`\``,
         "responses": {
           "200": {
             "description": "Retrieves a user name",
@@ -283,7 +298,12 @@ SOFTWARE.
       "get": {
         "tags": ["Tokens"],
         "summary": "Get Token Profile",
-        "description": "Get token profile",
+        "description": `Get tokens for the associative authenticated user
+
+\`\`\`bash
+$ npm token list
+<token-type> token <partial-token>… with id <uuid> created <date-created>
+\`\`\``,
         "responses": {
           "200": {
             "description": "Token Profile",
@@ -338,7 +358,7 @@ SOFTWARE.
       "post": {
         "tags": ["Tokens"],
         "summary": "Create Token",
-        "description": "Create a new token",
+        "description": "Creates a token for authenticated user or provided UUID user (later requires global read+write user scope)",
         "headers": {
           "Authorization": {
             "description": "The number of allowed requests in the current period",
@@ -433,7 +453,11 @@ SOFTWARE.
       "delete": {
         "tags": ["Tokens"],
         "summary": "Delete Token by Auth",
-        "description": "Delete a token by the token itself",
+        "description": `Revokes a token for the associative authenticated user
+
+\`\`\`bash
+$ npm token revoke <token>
+\`\`\``,
         "responses": {
           "204": {
             "description": "Token Deleted Response"
@@ -467,6 +491,7 @@ SOFTWARE.
       "get": {
         "tags": ["Packages"],
         "summary": "Get Package Packument",
+        "description": "Returns all published packages & metadata for the specific package name",
         "parameters": [
           {
             "in": "path",
@@ -543,6 +568,7 @@ SOFTWARE.
       "get": {
         "tags": ["Packages"],
         "summary": "Get Package Manifest",
+        "description": "Returns the full package manifest for a specific package version",
         "parameters": [
           {
             "in": "path",
