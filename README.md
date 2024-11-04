@@ -2,6 +2,8 @@
 
 `vsr` aims to be a minimal "npm-compatible" registry which replicates the core features found in `registry.npmjs.org` as well as adding net-new capabilities.
 
+<img src="https://github.com/user-attachments/assets/e76c6f8a-a078-4787-963c-8ec95a879731" alt="vsr api screenshot" />
+
 **Table of Contents:**
 
 - [Quick Starts](#quick-starts)
@@ -207,7 +209,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 
 </details>
 
-### API Documentation
+### API
 
 We have rich, interactive API docs out-of-the-box with the help of our friends [Scalar](https://scalar.com/). The docs can be found at the registry root when running `vsr` locally (ex. run `npx vltpkg/vsr` &/or check out this repo & run `npm run dev`)
 
