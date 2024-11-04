@@ -1,5 +1,6 @@
 // get openapi schema
 import { API } from './src/api.js'
+import { dev } from './wrangler.json'
 
 // get logos
 import IMAGES_VLT from './src/assets/images/clients/vlt.js'
@@ -24,7 +25,7 @@ export const SCOPE = ''
 export const ANY_PACKAGE_SPEC = '*'
 
 // the domain the registry is hosted on
-export const DOMAIN = 'http://localhost'
+export const DOMAIN = `http://localhost:${dev.port}`
 
 // the time in seconds to cache the registry
 export const REQUEST_TIMEOUT = 60 * 1000
