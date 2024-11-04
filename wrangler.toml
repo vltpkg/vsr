@@ -1,0 +1,21 @@
+---
+compatibility_date: '2024-09-19'
+compatibility_flags:
+- nodejs_compat
+main: src/index.js
+name: vsr
+workers_dev: true
+d1_databases:
+- binding: DB
+  database_id: vsr_local_database_id
+  database_name: vsr_local_database
+r2_buckets:
+- binding: BUCKET
+  bucket_name: vsr_local_bucket
+assets:
+  directory: "./src/assets/"
+dev:
+  local_protocol: http
+  port: 1337
+placement:
+  mode: smart
