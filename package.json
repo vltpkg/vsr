@@ -8,7 +8,7 @@
     "url": "git+https://github.com/vltpkg/vsr.git"
   },
   "bin": {
-    "vsr": "vsr"
+    "vsr": "./bin/vsr"
   },
   "scripts": {
     "setup": "wrangler d1 execute vsr_local_database --file ./src/db/setup.sql --local --persist-to local-store --experimental-json-config",
