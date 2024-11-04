@@ -11,21 +11,30 @@ import {
 } from '../utils/packages'
 
 export async function getPackageTarball (c) {
-  let { scope, pkg, version } = c.req.param()
-  pkg = scope ? `${scope}/${pkg}` : pkg
-  c.header('Content-Type', 'application/octet-stream')
-  c.status(200)
-  const filename = createFile({ pkg, version })
-  console.log('filename', filename)
+  let { scope, pkg } = c.req.param()
+  pkg = scope && pkg !== '-' ? `${scope}/${pkg}` : scope || pkg
+  const tarball = c.req.path.split('/').pop()
+  const filename = `${pkg}/${tarball}`
   const file = await c.env.BUCKET.get(filename)
   if (!file) {
     return c.json({ error: 'Not found' }, 404)
   }
+
+  c.header('Content-Type', 'application/octet-stream')
+  c.status(200)
   return c.body(file.body)
 }
 
 export async function getPackageManifest (c) {
-  let { version, pkg } = packageSpec(c)
+  let { version, pkg, isScoped } = packageSpec(c)
+  const tarballIndex = isScoped ? 3 : 2
+  const isTarball = c.req.path.split('/')[tarballIndex] === '-'
+
+  // fetch tarball if that's what is passed
+  if (pkg && isTarball) {
+    return getPackageTarball(c)
+  }
+
   if (!pkg) {
     return c.json({ error: 'Not found' }, 404)
   } else if (!version) {
@@ -61,8 +70,8 @@ export async function getPackageManifest (c) {
 export async function getPackagePackument (c) {
   let { pkg, scope } = c.req.param()
   const isScoped = scope && scope.startsWith('@')
-  const verionIndex = isScoped ? 4 : 3
-  const isVersioned = c.req.path.split('/').length === verionIndex
+  const versionIndex = isScoped ? 4 : 3
+  const isVersioned = c.req.path.split('/').length === versionIndex
   pkg = isScoped ? `${scope}/${pkg}` : scope || pkg
 
   // fetch manifest of unscoped packages if that's what is passed
@@ -191,7 +200,6 @@ export async function publishPackage (c) {
 
   // prioritize package.json values over "manifest" provided values
   // override `dist` as this cannot be trusted from the client
-  console.log('...', createFile({ pkg, version }))
   const store = {
     ...packageJSON,
     ...{
@@ -208,12 +216,11 @@ export async function publishPackage (c) {
   try {
     await c.env.DB.prepare(insertQuery).run()
   } catch (err) {
-    console.log('existing package.....', err)
     return c.json({ error: 'Existing Package' }, 409)
   }
 
   // upload file to bucket
-  await c.env.BUCKET.put(filename, contents)
+  await c.env.BUCKET.put(`${pkg}/${filename}`, contents)
 
   return c.json({}, 200)
 }

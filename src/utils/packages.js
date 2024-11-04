@@ -46,6 +46,7 @@ export function packageSpec (c) {
 }
 
 export function createFile ({ pkg, version }) {
+  console.log(pkg, version)
   return (new URL(getNpmTarballUrl(pkg, version))).pathname.slice(1)
 }
 
