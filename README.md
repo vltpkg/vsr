@@ -35,10 +35,10 @@ git clone https://github.com/vltpkg/vsr.git
 cd ./vsr
 
 # install the project's dependencies
-vlt install
+npm install
 
 # run tbe development script
-vlr dev
+npm run dev
 ```
 
 ### Requirements
@@ -56,7 +56,7 @@ vlr dev
 
 - `git`
 - `node`
-- `vlt`
+- `npm`
 
 ### Features
 
@@ -69,18 +69,18 @@ vlr dev
 | ✅ | api: admin user management (add/update/remove users) |
 | ✅ | api: user token management (add/update/remove tokens) |
 | ✅ | web: docs portal |
-| ⏳ | api: unscoped packages |
-| ⏳ | api: unscoped packages |
+| ✅ | api: unscoped packages |
 | 🕤 | web: admin user management |
 | 🕤 | web: user registration |
 | 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
 | 🕤 | web: user account management |
-| 🕤 | web & api: custom dist-tags (`latest`  is supported) |
-| 🕤 | web & api: token rate-limiting |
+| ⏳ | web & api: custom dist-tags (`latest`  is supported) |
+| ⏳ | web & api: token rate-limiting |
 | 🕤 | web & api: search |
 | 🕤 | web & api: staging |
 
 - ✅ implemented
+- ⏳ in progress
 - 🕤 planned to support
 
 ### Granular Access Tokens
