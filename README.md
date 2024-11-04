@@ -108,6 +108,10 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 > [!NOTE]
 > - user/org/team management via `@<scope>` is not supported at the moment
 
+<details>
+
+  <summary>Examples</summary>
+
 ##### Subscriber
 
 ```json
@@ -149,7 +153,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-##### Admin
+##### Organization Admin
 
 ```json
 [
@@ -174,7 +178,34 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-### Documentation
+##### Owner
+
+```json
+[
+  {
+    "values": ["*"],
+    "types": {
+      "pkg": {
+        "read": true,
+        "write": true
+      }
+    }
+  },
+   {
+    "values": ["*"],
+    "types": {
+      "user": {
+        "read": true,
+        "write": true
+      }
+    }
+  }
+]
+```
+
+</details>
+
+### API Documentation
 
 We have rich, interactive API docs out-of-the-box with the help of our friends [Scalar](https://scalar.com/). The docs can be found at the registry root when running `vsr` locally (ex. run `npx vltpkg/vsr` &/or check out this repo & run `npm run dev`)
 
@@ -234,7 +265,7 @@ registry=https://registry.example.com
 - ✅ supported
 - ❌ unsupported
 
-### Competitive Breakdown
+### Feature Comparisons
 
 | Feature | `vsr` | `verdaccio` | `jsr` |
 | -- | :-: | :-: | :-: |
