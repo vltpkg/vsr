@@ -8,9 +8,10 @@
 
 - [Quick Starts](#quick-starts)
 - [Requirements](#requirements)
-- [Features](#features)
 - [API](#api)
 - [Compatibility](#compatibility)
+- [Comparisons](#comparisons)
+- [Roadmap](#roadmap)
 - [License](#license)
 
 ### Quick Starts
@@ -58,31 +59,6 @@ npm run dev
 - `node`
 - `npm`
 
-### Features
-
-| Status | Feature |
-| :--: | :-- |
-| ✅ | api: minimal package metadata |
-| ✅ | api: full package manifests |
-| ✅ | api: publishing private, scoped packages |
-| ✅ | api: package manifest validation |
-| ✅ | api: admin user management (add/update/remove users) |
-| ✅ | api: user token management (add/update/remove tokens) |
-| ✅ | web: docs portal |
-| ✅ | api: unscoped packages |
-| 🕤 | web: admin user management |
-| 🕤 | web: user registration |
-| 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
-| 🕤 | web: user account management |
-| ⏳ | web & api: custom dist-tags (`latest`  is supported) |
-| ⏳ | web & api: token rate-limiting |
-| 🕤 | web & api: search |
-| 🕤 | web & api: staging |
-
-- ✅ implemented
-- ⏳ in progress
-- 🕤 planned to support
-
 ### Granular Access Tokens
 
 All tokens are considered "granular access tokens" (GATs). Token entries in the database consist of 3 parts:
@@ -114,23 +90,25 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 
 <details>
 
-  <summary>Examples</summary>
+  <summary>Scope Examples</summary>
 
-##### Subscriber
+##### End-user/Subscriber Persona
+
+- specific package read access
+- individual user read+write access
 
 ```json
 [
   {
-    "values": ["@compabny/pro"],
+    "values": ["@organization/package-name"],
     "types": {
       "pkg": {
         "read": true,
-        "write": true,
       }
     }
   },
   {
-    "values": ["~uuid-1234-5678"],
+    "values": ["~johnsmith"],
     "types": {
       "user": {
         "read": true,
@@ -141,7 +119,65 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-##### Maintainer
+##### Team Member/Maintainer Persona
+
+- scoped package read+write access
+- individual user read+write access
+
+```json
+[
+  {
+    "values": ["@organization/*"],
+    "types": {
+      "pkg": {
+        "read": true
+      }
+    }
+  },
+  {
+    "values": ["~johnsmith"],
+    "types": {
+      "user": {
+        "read": true,
+        "write": true,
+      }
+    }
+  }
+]
+```
+
+##### Package Publish CI Persona
+
+- organization scoped packages read+write access
+- individual user read+write access
+
+```json
+[
+  {
+    "values": ["@organization/package-name"],
+    "types": {
+      "pkg": {
+        "read": true
+      }
+    }
+  },
+  {
+    "values": ["~johnsmith"],
+    "types": {
+      "user": {
+        "read": true,
+        "write": true,
+      }
+    }
+  }
+]
+```
+
+
+##### Organization Admin Persona
+
+- organization scoped package read+write access
+- organization users read+write access
 
 ```json
 [
@@ -150,29 +186,8 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
     "types": {
       "pkg": {
         "read": true,
-        "write": true,
-      }
-    }
-  }
-]
-```
-
-##### Organization Admin
-
-```json
-[
-  {
-    "values": ["@company/*"],
-    "types": {
-      "pkg": {
-        "read": true,
         "write": true
-      }
-    }
-  },
-   {
-    "values": ["*"],
-    "types": {
+      },
       "user": {
         "read": true,
         "write": true
@@ -182,7 +197,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 ]
 ```
 
-##### Owner
+##### Registry Owner/Admin Persona
 
 ```json
 [
@@ -192,15 +207,12 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
       "pkg": {
         "read": true,
         "write": true
-      }
-    }
-  },
-   {
-    "values": ["*"],
-    "types": {
-      "user": {
-        "read": true,
-        "write": true
+      },
+      {
+        "user": {
+          "read": true,
+          "write": true
+        }
       }
     }
   }
@@ -215,16 +227,23 @@ We have rich, interactive API docs out-of-the-box with the help of our friends [
 
 ### `npm` Client Compatibility
 
-The following commands should work out-of-the-box with `npm` & any other `npm` "Compatible" clients although their specific commands & arguments may be vary (ex. `vlt`, `yarn`, `pnpm` & `bun`)
+The following commands should work out-of-the-box with `npm` & any other `npm` "compatible" clients although their specific commands & arguments may vary (ex. `vlt`, `yarn`, `pnpm` & `bun`)
 
 #### Configuration
 
-To use a registry you must either pass the registry config through an flag (ex. `--registry=...` for `npm`) or define client-specific configuration which stores the reference to your registry (ex. `.npmrc` for `npm`)
+To use `vsr` as your registry you must either pass a registry config through a client-specific flag (ex. `--registry=...` for `npm`) or define client-specific configuration which stores the reference to your registry (ex. `.npmrc` for `npm`). Access to the registry & packages is private by default although an `"admin"` user is created during setup locally (for development purposes) with a default auth token of `"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"`.
 
 ```ini
 ; .npmrc
-registry=https://registry.example.com
+registry=http://localhost:1337
+//localhost:1337/:_authToken=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
+
+#### Supported `npm` Commands
+
+- ✅ implemented
+- ⏳ in progress
+- 🕤 planned to support
 
 | Support | Commannd |
 | :--: | :-- |
@@ -269,35 +288,54 @@ registry=https://registry.example.com
 - ✅ supported
 - ❌ unsupported
 
-### Feature Comparisons
+### Comparisons
 
 | Feature | `vsr` | `verdaccio` | `jsr` |
 | -- | :-: | :-: | :-: |
 | Serverless | ✅ | ❌ | ❌ |
 | JavaScript Backend | ✅ | ✅ | ❌ |
 | Granular Access/Permissions | ✅ | ✅ | ❌ |
-| Proxy Upstream Registries | ✅ | ✅ | ❌ |
+| Proxy Upstream Registries | ⏳ | ✅ | ❌ |
 | Unscoped Package Names | ✅ | ✅ | ❌ |
 | npm Package Publishing | ✅ | ✅ | ❌ |
 | npm Package Installation | ✅ | ✅ | ✅<sup>*</sup> |
-| CDN | ✅ | ❌ | ✅ |
-| ESM | ✅ | ❌ | ✅ |
+| CDN | 🕤 | ❌ | ✅ |
+| ESM | 🕤 | ❌ | ✅ |
 | Manifest Validation | ✅ | ❌ | ❌ |
-| Plugins | ❌ | ✅ | ❌ |
-| Events/Hooks | ❌ | ✅ | ❌ |
+| Plugins | ⏳ | ✅ | ❌ |
+| Events/Hooks | 🕤 | ✅ | ❌ |
 | Programmatic API | ❌ | ✅ | ❌ |
-| Web Interface | ❌ | ✅ | ✅ |
-| Search | ❌ | ✅ | ✅ |
+| Web Interface | 🕤 | ✅ | ✅ |
+| Search | 🕤 | ✅ | ✅ |
 | First-Class Typescript | ❌ | ❌ | ✅ |
 | API Documentation Generation | ❌ | ❌ | ✅ |
-| Multi-Cloud | ❌ | ✅ | ✅ |
+| Multi-Cloud | 🕤 | ✅ | ✅ |
 | **Azure DevOps Artifacts** Upstream | ✅ | ✅ | ✅ |
 | **JFrog Artifactory** Upstream | ✅ | ✅ | ❌ |
 | **Google Artifact Registry** Upstream | ✅ | ✅ | ❌ |
 
-```
-* requires jsr-specific tooling or use a modified package name when using traditional npm clients (ref. https://jsr.io/docs/npm-compatibility)
-```
+> `*` requires `jsr`-specific tooling or use a modified package name when using traditional npm clients (ref. https://jsr.io/docs/npm-compatibility)
+
+### Roadmap
+
+| Status | Feature |
+| :--: | :-- |
+| ✅ | api: minimal package metadata |
+| ✅ | api: full package manifests |
+| ✅ | api: publishing private, scoped packages |
+| ✅ | api: package manifest validation |
+| ✅ | api: admin user management (add/update/remove users) |
+| ✅ | api: user token management (add/update/remove tokens) |
+| ✅ | web: docs portal |
+| ✅ | api: unscoped packages |
+| 🕤 | web: admin user management |
+| 🕤 | web: user registration |
+| 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
+| 🕤 | web: user account management |
+| ⏳ | web & api: custom dist-tags (`latest`  is supported) |
+| ⏳ | web & api: token rate-limiting |
+| 🕤 | web & api: search |
+| 🕤 | web & api: staging |
 
 ### License
 
