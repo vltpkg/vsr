@@ -328,14 +328,14 @@ registry=http://localhost:1337
 | ✅ | api: user token management (add/update/remove tokens) |
 | ✅ | web: docs portal |
 | ✅ | api: unscoped packages |
-| 🕤 | web: admin user management |
-| 🕤 | web: user registration |
-| 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
-| 🕤 | web: user account management |
 | ⏳ | web & api: custom dist-tags (`latest`  is supported) |
 | ⏳ | web & api: token rate-limiting |
 | 🕤 | web & api: search |
 | 🕤 | web & api: staging |
+| 🕤 | web: admin user management |
+| 🕤 | web: user registration |
+| 🕤 | web: user login (ex. `npm login` / `--auth-type=web`) |
+| 🕤 | web: user account management |
 
 ### License
 
