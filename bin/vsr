@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-console.log('running vsr')
-
-// const { scripts } = require('../package.json')
-// const { execSync } = require('node:child_process')
-// execSync(scripts.setup, { stdio: 'inherit' })
-// execSync(scripts.dev, { stdio: 'inherit' })
+const { scripts } = require('../package.json')
+const { execSync } = require('node:child_process')
+execSync(scripts.setup, { stdio: 'inherit' })
+execSync(scripts.dev, { stdio: 'inherit' })
