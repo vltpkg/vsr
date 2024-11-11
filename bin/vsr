@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+const { resolve } = require('node:path')
 const { scripts } = require('../package.json')
 const { execSync } = require('node:child_process')
-execSync(scripts.setup, { stdio: 'inherit' })
-execSync(scripts.dist, { stdio: 'inherit' })
+const cwd = resolve(__dirname, '../')
+execSync(scripts.setup, { cwd, stdio: 'inherit' })
+execSync(scripts.dist, { cwd, stdio: 'inherit' })
