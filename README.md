@@ -16,6 +16,14 @@
 
 ### Quick Starts
 
+#### Local
+
+You can quickly get started by installing/executing `vsr` with the following command:
+
+```bash
+npx -y vltpkg/vsr
+```
+
 #### Production
 
 You can deploy `vsr` to [Cloudflare](https://www.cloudflare.com/) in under 5 minutes, for free, with a single click (coming soon).
@@ -223,7 +231,7 @@ A `scope` contains an array of privileges that define both the type(s) of & acce
 
 ### API
 
-We have rich, interactive API docs out-of-the-box with the help of our friends [Scalar](https://scalar.com/). The docs can be found at the registry root when running `vsr` locally (ex. run `npx vltpkg/vsr` &/or check out this repo & run `npm run dev`)
+We have rich, interactive API docs out-of-the-box with the help of our friends [Scalar](https://scalar.com/). The docs can be found at the registry root when running `vsr` locally (ex. run `npx -y vltpkg/vsr` &/or check out this repo & run `npm run dev`)
 
 ### `npm` Client Compatibility
 
