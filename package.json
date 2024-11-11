@@ -17,8 +17,7 @@
     "dev": "wrangler dev --local --persist-to local-store --experimental-json-config",
     "deploy": "wrangler deploy",
     "build": "NODE_NO_WARNINGS=1 node ./scripts/build.mjs",
-    "lint": "prettier .",
-    "postinstall": "npm run setup && npm run dev"
+    "lint": "prettier ."
   },
   "devDependencies": {
     "libnpmpack": "^7.0.4",
