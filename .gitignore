@@ -173,4 +173,3 @@ dist
 .dev.vars
 .wrangler/
 local-store
-dist/
