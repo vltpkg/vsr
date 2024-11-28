@@ -119,6 +119,20 @@ export async function getPackagePackument (c) {
   return c.json(ret, 200)
 }
 
+async function mergeTags(db, pkg, tags) {
+    const selectQuery = `SELECT name, tags FROM packages WHERE name="${pkg}"`
+    const rows = await db.prepare(selectQuery).run()
+    if (rows.results.length) {
+      tags = { ...JSON.parse(rows.results[0].tags), ...tags }
+    }
+    const insertQueryFn = (tags) => {
+        const strTags = `json('${JSON.stringify(tags)}')`
+	return `INSERT INTO packages (name, tags) VALUES ("${pkg}", ${strTags})
+                  ON CONFLICT(name) DO UPDATE SET tags=${strTags}`
+    }
+    await db.prepare(insertQueryFn(tags)).run()
+}
+
 export async function publishPackage (c) {
   const { pkg } = packageSpec(c)
   const body = await c.req.json()
@@ -135,8 +149,7 @@ export async function publishPackage (c) {
   const new_versions = Object.keys(body.versions).filter(v => !versions.includes(v))
 
   if (!results || results.length === 0) {
-    const insertQuery = `INSERT INTO packages (name, tags) VALUES ("${pkg}", json('{"latest": "${new_versions[0]}"}'))`
-    await c.env.DB.prepare(insertQuery).run()
+    await mergeTags(c.env.DB, pkg, { latest: new_versions[0] })
   }
 
   // check for conflicts in publishing vs. existing
