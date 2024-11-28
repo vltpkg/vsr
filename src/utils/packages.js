@@ -5,9 +5,13 @@ import getNpmTarballUrl from 'get-npm-tarball-url'
 import semver from 'semver'
 
 export async function extractPackageJSON (buffer) {
+  console.log(`ext-1`, buffer);
   const blob = new Blob([Buffer.from(buffer)])
+  console.log(`ext-2`);
   const stream = blob.stream().pipeThrough(new DecompressionStream('gzip'))
+  console.log(`ext-3`);
   for await (const obj of extract(stream)) {
+    console.log(`ext-3.1`, obj.header.name);
     if (obj.header.name === 'package/package.json') {
       return JSON.parse(await obj.text())
     }
