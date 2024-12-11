@@ -5,7 +5,6 @@
   ],
   "main": "src/index.js",
   "name": "vsr",
-  "workers_dev": true,
   "d1_databases": [
     {
       "binding": "DB",
@@ -21,10 +20,6 @@
   ],
   "assets": {
     "directory": "./src/assets/"
-  },
-  "dev": {
-    "local_protocol": "http",
-    "port": 1337
   },
   "placement": {
     "mode": "smart"
