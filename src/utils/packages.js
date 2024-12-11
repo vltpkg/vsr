@@ -1,4 +1,3 @@
-import { DOMAIN } from '../../config.js'
 import { Buffer } from 'node:buffer'
 import { extract } from 'streaming-tarball'
 import getNpmTarballUrl from 'get-npm-tarball-url'
@@ -67,7 +66,7 @@ export function createVersion ({ pkg, version, manifest }) {
     name: pkg,
     version,
     dist: {
-      tarball: `${DOMAIN}/${file}`
+      tarball: `${DMNO_CONFIG.REGISTRY_URL}/${file}`
     }
   }
   return { ...manifest, ...temp }

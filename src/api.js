@@ -1,21 +1,18 @@
-const { version } = require('../package.json')
-const { dev } = require('../wrangler.json')
-const localhost = {
-  "url": `http://localhost:${dev.port}`,
-  "description": "localhost"
-}
 const npm = {
   "url": "https://registry.npmjs.org",
   "description": "npm public registry"
 }
 const year = new Date().getFullYear()
 
-module.exports.API = {
+export const API = {
   "openapi": "3.1.0",
-  "servers": [ localhost ],
+  "servers": [{
+    "url": DMNO_CONFIG.REGISTRY_URL,
+    "description": DMNO_CONFIG.REGISTRY_INSTANCE_DESCRIPTION,
+  }],
   "info": {
     "title": `vlt serverless registry`,
-    "version": version,
+    "version": DMNO_CONFIG.VSR_VERSION,
     "license": {
       "identifier": "FSL-1.1-MIT",
       "name": "Functional Source License, Version 1.1, MIT Future License",

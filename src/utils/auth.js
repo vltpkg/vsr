@@ -1,4 +1,4 @@
-import { ANY_PACKAGE_SPEC } from '../../config'
+import { ANY_PACKAGE_SPEC } from '../config'
 import { packageSpec } from './packages'
 
 export function getTokenFromHeader (c) {

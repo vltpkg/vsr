@@ -172,3 +172,17 @@ out
 .dev.vars
 .wrangler/
 local-store
+
+# dmno files ###
+# local cache for resolved values
+**/.dmno/cache.json
+# encryption key used for cache
+**/.dmno/cache-key.json
+# generated type files
+**/.dmno/.typegen
+# iconify cache used in generated types
+**/.dmno/.icon-cache
+# local config overrides
+**/.dmno/.env.local
+# local ssl certs
+**/.dmno/certs
