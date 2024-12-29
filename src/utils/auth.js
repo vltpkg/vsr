@@ -69,8 +69,8 @@ export function isUserRoute (path) {
 }
 
 export async function getUserFromToken ({ c, token }) {
-  const query = `SELECT * FROM tokens WHERE token = "${token}"`
-  const { results } = await c.env.DB.prepare(query).run()
+  const query = "SELECT * FROM tokens WHERE token = ?"
+  const { results } = await c.env.DB.prepare(query).bind(token).run()
   const row = results.length ? results[0] : null
   const uuid = row ? row.uuid : null
   const scope = row ? JSON.parse(row.scope) : null
