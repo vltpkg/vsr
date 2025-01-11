@@ -6,6 +6,13 @@ export async function getUsername (c) {
 }
 
 export async function getUserProfile (c) {
-  const { uuid } = await getAuthedUser({c})
-  return c.json({ name: uuid }, 200)
+  const { uuid, scope } = await getAuthedUser({c})
+  return c.json({
+    name: uuid,
+    email: scope.email,
+    email_verified: scope.email_verified,
+    github: scope.github,
+    created: scope.created,
+    updated: scope.updated,
+  }, 200)
 }
