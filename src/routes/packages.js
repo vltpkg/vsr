@@ -2,7 +2,6 @@ import { Buffer } from 'node:buffer'
 import validate from 'validate-npm-package-name'
 import semver from 'semver'
 import { accepts } from 'hono/accepts'
-import { DOMAIN } from '../../config'
 import {
   extractPackageJSON,
   packageSpec,
@@ -60,7 +59,7 @@ export async function getPackageManifest (c) {
   const manifest = JSON.parse(row.manifest)
   const ret = { ...manifest, ...{
     dist: {
-      tarball: `${DOMAIN}/${createFile({ pkg, version })}`
+      tarball: `${DMNO_CONFIG.REGISTRY_URL}/${createFile({ pkg, version })}`
     }
   }}
 

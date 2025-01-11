@@ -1,3 +1,6 @@
+// init dmno config - should be first
+import 'dmno/injector-standalone/edge-auto';
+
 // TODO: check all SQL query strings for SQL injection vulnerabilities
 // TODO: switch to using prepared statements/parameterized queries
 // ex. c.env.DB.prepare("SELECT * FROM users WHERE user_id = ?1").bind(userId)
@@ -11,7 +14,7 @@ import { apiReference } from '@scalar/hono-api-reference'
 import { secureHeaders } from 'hono/secure-headers'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 
-import { PROXIES, API_DOCS } from '../config.js'
+import { PROXIES, API_DOCS } from './config.js'
 import { verifyToken } from './utils/auth'
 import { getUsername, getUserProfile } from './routes/users'
 import { getToken, putToken, postToken, deleteToken } from './routes/tokens'
@@ -72,6 +75,9 @@ if (PROXIES) {
 
 // GET scalar API reference
 app.get('/', apiReference(API_DOCS))
+
+// GET openapi schema json only
+app.get('/openapi.json', (c) => c.json(API_DOCS.spec.content, 200))
 
 // GET /-/ping
 app.get('/-/ping', (c) => c.json({}, 200))

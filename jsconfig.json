@@ -1,0 +1,10 @@
+{
+  "include": [
+    "**/*.js",
+    ".dmno/.typegen/global.d.ts",
+    ".dmno/.typegen/global-public.d.ts"
+  ],
+  "compilerOptions": {
+    "strict": true
+  }
+}

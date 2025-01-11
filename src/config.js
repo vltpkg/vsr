@@ -1,6 +1,5 @@
 // get openapi schema
-import { API } from './src/api.js'
-import { dev } from './wrangler.json'
+import { API } from './api.js'
 
 // the packages to proxy
 export const PROXIES = []
@@ -14,9 +13,6 @@ export const SCOPE = ''
 
 // the global scope/glob pattern for all packages
 export const ANY_PACKAGE_SPEC = '*'
-
-// the domain the registry is hosted on
-export const DOMAIN = `http://localhost:${dev.port}`
 
 // the time in seconds to cache the registry
 export const REQUEST_TIMEOUT = 60 * 1000
@@ -37,11 +33,11 @@ export const API_DOCS = {
   authentication: {
     http: {
       bearer: {
-        token: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+        token: DMNO_CONFIG.BEARER_TOKEN,
       },
       basic: {
-        username: 'user',
-        password: 'pass'
+        username: DMNO_CONFIG.BASIC_AUTH_USER,
+        password: DMNO_CONFIG.BASIC_AUTH_PASSWORD,
       }
     }
   },
@@ -69,5 +65,5 @@ export const API_DOCS = {
   spec: {
     content: API
   },
-  customCss: `@import '${DOMAIN}/styles/styles.css';`
+  customCss: `@import '${DMNO_CONFIG.REGISTRY_URL}/styles/styles.css';`
 }

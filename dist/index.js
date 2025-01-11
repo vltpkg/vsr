@@ -6,6 +6,9 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -27,900 +30,18 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __template = (cooked, raw2) => __freeze(__defProp(cooked, "raw", { value: __freeze(raw2 || cooked.slice()) }));
 
-// package.json
-var require_package = __commonJS({
-  "package.json"(exports, module) {
-    module.exports = {
-      name: "vsr",
-      version: "0.1.1",
-      license: "FSL-1.1-MIT",
-      author: "vlt technology inc. <support@vlt.sh> (http://vlt.sh)",
-      repository: {
-        type: "git",
-        url: "git+https://github.com/vltpkg/vsr.git"
-      },
-      bin: {
-        vsr: "./bin/vsr"
-      },
-      scripts: {
-        setup: `wrangler d1 execute vsr_local_database --command "CREATE TABLE IF NOT EXISTS packages ('name' TEXT PRIMARY KEY, tags JSON); CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, uuid TEXT, scope JSON); CREATE TABLE IF NOT EXISTS versions (spec TEXT PRIMARY KEY, manifest JSON, published_at TEXT); INSERT OR REPLACE INTO tokens (token, uuid, scope) VALUES ('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'admin', '[ { \\"values\\": [\\"*\\"], \\"types\\": { \\"pkg\\": { \\"read\\": true, \\"write\\": true } } }, { \\"values\\": [\\"*\\"], \\"types\\": { \\"user\\": { \\"read\\": true, \\"write\\": true } } } ]');" --local --persist-to local-store --experimental-json-config`,
-        drop: "wrangler d1 execute vsr_local_database --command 'DROP TABLE IF EXISTS packages;DROP TABLE IF EXISTS tokens;DROP TABLE IF EXISTS versions;' --local --persist-to local-store --experimental-json-config && rm -rf local-store && rm -rf .wrangler",
-        migrate: "wrangler d1 migrations apply vsr_local_database  --local --persist-to local-store --experimental-json-config",
-        dist: "wrangler dev ./dist/index.js --local --persist-to local-store --experimental-json-config",
-        dev: "wrangler dev --local --persist-to local-store --experimental-json-config",
-        bundle: "wrangler deploy --dry-run --outdir dist",
-        deploy: "wrangler deploy",
-        build: "NODE_NO_WARNINGS=1 node ./scripts/build.mjs",
-        lint: "prettier ."
-      },
-      devDependencies: {
-        libnpmpack: "^7.0.4",
-        "npm-registry-fetch": "^17.1.0",
-        prettier: "^3.3.3",
-        ssri: "^10.0.6",
-        "@hono-rate-limiter/cloudflare": "^0.2.1",
-        "@scalar/hono-api-reference": "^0.5.158",
-        "get-npm-tarball-url": "^2.1.0",
-        hono: "^4.5.5",
-        "hono-rate-limiter": "^0.4.0",
-        "js-yaml": "^4.1.0",
-        semver: "^7.6.3",
-        "streaming-tarball": "^1.0.3",
-        uuid: "^10.0.0",
-        "validate-npm-package-name": "5.0.0"
-      },
-      peerDependencies: {
-        wrangler: "^3.84.1"
-      },
-      devEngines: {
-        runtime: {
-          name: "node",
-          onFail: "warn"
-        },
-        packageManager: {
-          name: "npm",
-          onFail: "warn"
-        }
-      },
-      engines: {
-        node: ">=22.11.0",
-        npm: ">=10.9.0"
-      }
-    };
+// <define:__DMNO_INJECTED_CONFIG__>
+var define_DMNO_INJECTED_CONFIG_default;
+var init_define_DMNO_INJECTED_CONFIG = __esm({
+  "<define:__DMNO_INJECTED_CONFIG__>"() {
+    define_DMNO_INJECTED_CONFIG_default = { WRANGLER_ENV: {}, WRANGLER_DEV_PORT: { value: 1337 }, WRANGLER_DEV_URL: { value: "http://localhost:1337" }, WRANGLER_LIVE_RELOAD: { value: true }, WRANGLER_DEV_ACTIVE: { value: false }, WRANGLER_BUILD_ACTIVE: { value: true }, VSR_VERSION: { value: "0.1.1" }, REGISTRY_URL: { value: "http://localhost:1337" }, REGISTRY_INSTANCE_DESCRIPTION: { value: "localhost" }, BEARER_TOKEN: { value: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" }, BASIC_AUTH_USER: { value: "user" }, BASIC_AUTH_PASSWORD: { value: "pass" }, $SETTINGS: { redactSensitiveLogs: true, interceptSensitiveLeakRequests: true, preventClientLeaks: true } };
   }
 });
 
-// wrangler.json
-var require_wrangler = __commonJS({
-  "wrangler.json"(exports, module) {
-    module.exports = {
-      compatibility_date: "2024-09-19",
-      compatibility_flags: [
-        "nodejs_compat"
-      ],
-      main: "src/index.js",
-      name: "vsr",
-      workers_dev: true,
-      d1_databases: [
-        {
-          binding: "DB",
-          database_id: "vsr_local_database_id",
-          database_name: "vsr_local_database"
-        }
-      ],
-      r2_buckets: [
-        {
-          binding: "BUCKET",
-          bucket_name: "vsr_local_bucket"
-        }
-      ],
-      assets: {
-        directory: "./src/assets/"
-      },
-      dev: {
-        local_protocol: "http",
-        port: 1337
-      },
-      placement: {
-        mode: "smart"
-      }
-    };
-  }
-});
-
-// src/api.js
-var require_api = __commonJS({
-  "src/api.js"(exports, module) {
-    var { version } = require_package();
-    var { dev: dev2 } = require_wrangler();
-    var localhost = {
-      "url": `http://localhost:${dev2.port}`,
-      "description": "localhost"
-    };
-    var year = (/* @__PURE__ */ new Date()).getFullYear();
-    module.exports.API = {
-      "openapi": "3.1.0",
-      "servers": [localhost],
-      "info": {
-        "title": `vlt serverless registry`,
-        "version": version,
-        "license": {
-          "identifier": "FSL-1.1-MIT",
-          "name": "Functional Source License, Version 1.1, MIT Future License",
-          "url": "https://fsl.software/FSL-1.1-MIT.template.md"
-        },
-        "description": `
-  The **vlt serverless registry** is a npm compatible JavaScript package registry which replicates core features & functionality of **\`registry.npmjs.org\`** while also introducing net-new capabilities.
-
-  ### Compatible Clients
-
-  <table>
-    <tbody>
-      <tr>
-        <td><a href="https://vlt.sh" alt="vlt"><strong><code>vlt</code></strong></a></td>
-        <td><a href="https://npmjs.com/package/npm" alt="npm"><strong><code>npm</code></strong></a></td>
-        <td><a href="https://yarnpkg.com/" alt="yarn"><strong><code>yarn</code></strong></a></td>
-        <td><a href="https://pnpm.io/" alt="pnpm"><strong><code>pnpm</code></strong></a></td>
-        <td><a href="https://deno.com/" alt="deno"><strong><code>deno</code></strong></a></td>
-        <td><a href="https://bun.sh/" alt="bun"><strong><code>bun</code></strong></a></td>
-      </tr>
-    </tbody>
-  </table>
-
-  ### Resources
-
-  <ul alt="resources">
-    <li><a href="https://vlt.sh">https://<strong>vlt.sh</strong></a></li>
-    <li><a href="https://github.com/vltpkg/vsr">https://github.com/<strong>vltpkg/vsr</strong></a></li>
-    <li><a href="https://discord.gg/vltpkg">https://discord.gg/<strong>vltpkg</strong></a></li>
-    <li><a href="https://x.com/vltpkg">https://x.com/<strong>vltpkg</strong></a></li>
-  </ul>
-
-  ##### Trademark Disclaimer
-
-  <p alt="trademark-disclaimer">All trademarks, logos and brand names are the property of their respective owners. All company, product and service names used in this website are for identification purposes only. Use of these names, trademarks and brands does not imply endorsement.</p>
-
-  ### License
-
-<details alt="license">
-  <summary><strong>Functional Source License</strong>, Version 1.1, MIT Future License</summary>
-<h1>Functional Source License,<br />Version 1.1,<br />MIT Future License</h1>
-<h2>Abbreviation</h2>
-
-FSL-1.1-MIT
-
-<h2>Notice</h2>
-
-Copyright ${year} vlt technology inc.
-
-<h2>Terms and Conditions</h2>
-
-<h3>Licensor ("We")</h3>
-
-The party offering the Software under these Terms and Conditions.
-
-<h3>The Software</h3>
-
-The "Software" is each version of the software that we make available under
-these Terms and Conditions, as indicated by our inclusion of these Terms and
-Conditions with the Software.
-
-<h3>License Grant</h3>
-
-Subject to your compliance with this License Grant and the Patents,
-Redistribution and Trademark clauses below, we hereby grant you the right to
-use, copy, modify, create derivative works, publicly perform, publicly display
-and redistribute the Software for any Permitted Purpose identified below.
-
-<h3>Permitted Purpose</h3>
-
-A Permitted Purpose is any purpose other than a Competing Use. A Competing Use
-means making the Software available to others in a commercial product or
-service that:
-
-1. substitutes for the Software;
-
-2. substitutes for any other product or service we offer using the Software
-  that exists as of the date we make the Software available; or
-
-3. offers the same or substantially similar functionality as the Software.
-
-Permitted Purposes specifically include using the Software:
-
-1. for your internal use and access;
-
-2. for non-commercial education;
-
-3. for non-commercial research; and
-
-4. in connection with professional services that you provide to a licensee
-  using the Software in accordance with these Terms and Conditions.
-
-<h3>Patents</h3>
-
-To the extent your use for a Permitted Purpose would necessarily infringe our
-patents, the license grant above includes a license under our patents. If you
-make a claim against any party that the Software infringes or contributes to
-the infringement of any patent, then your patent license to the Software ends
-immediately.
-
-<h3>Redistribution</h3>
-
-The Terms and Conditions apply to all copies, modifications and derivatives of
-the Software.
-
-If you redistribute any copies, modifications or derivatives of the Software,
-you must include a copy of or a link to these Terms and Conditions and not
-remove any copyright notices provided in or with the Software.
-
-<h3>Disclaimer</h3>
-
-THE SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF FITNESS FOR A PARTICULAR
-PURPOSE, MERCHANTABILITY, TITLE OR NON-INFRINGEMENT.
-
-IN NO EVENT WILL WE HAVE ANY LIABILITY TO YOU ARISING OUT OF OR RELATED TO THE
-SOFTWARE, INCLUDING INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES,
-EVEN IF WE HAVE BEEN INFORMED OF THEIR POSSIBILITY IN ADVANCE.
-
-<h3>Trademarks</h3>
-
-Except for displaying the License Details and identifying us as the origin of
-the Software, you have no right under these Terms and Conditions to use our
-trademarks, trade names, service marks or product names.
-
-<h2>Grant of Future License</h2>
-
-We hereby irrevocably grant you an additional license to use the Software under
-the MIT license that is effective on the second anniversary of the date we make
-the Software available. On or after that date, you may use the Software under
-the MIT license, in which case the following will apply:
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-</dialog>
-  `
-      },
-      "components": {
-        "securitySchemes": {
-          "bearerAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "Bearer <token>"
-          }
-        }
-      },
-      "security": [
-        {
-          "bearerAuth": []
-        }
-      ],
-      "tags": [
-        {
-          "name": "Users",
-          "description": "Some endpoints are public, but some require authentication. We provide all the required endpoints to create an account and authorize yourself."
-        },
-        {
-          "name": "Tokens",
-          "description": ""
-        },
-        {
-          "name": "Packages",
-          "description": ""
-        },
-        {
-          "name": "Misc.",
-          "description": ""
-        }
-      ],
-      "paths": {
-        "/-/npm/v1/user": {
-          "get": {
-            "tags": ["Users"],
-            "summary": "Get User Profile",
-            "description": `Returns profile object associated with auth token
-\`\`\`bash
-$ npm profile
-name: johnsmith
-created: 2015-02-26T01:26:01.124Z
-updated: 2023-01-10T21:55:32.118Z
-\`\`\``,
-            "responses": {
-              "200": {
-                "description": "User Profile",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "example": {
-                        "name": "johnsmith"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "/-/ping": {
-          "get": {
-            "tags": ["Misc."],
-            "summary": "Ping",
-            "description": `Check if the server is alive
-\`\`\`bash
-$ npm ping
-npm notice PING http://localhost:1337/
-npm notice PONG 13ms
-\`\`\``,
-            "security": [],
-            "responses": {
-              "200": {
-                "description": "Server is alive",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "/": {
-          "get": {
-            "tags": ["Misc."],
-            "summary": "Documentation",
-            "description": "Get the registry docs",
-            "responses": {
-              "200": {
-                "description": "Retrieves the registry docs"
-              }
-            }
-          }
-        },
-        "/-/whoami": {
-          "get": {
-            "tags": ["Users"],
-            "summary": "Get User Username",
-            "description": `Returns username associated with auth token
-\`\`\`bash
-$ npm whoami
-johnsmith
-\`\`\``,
-            "responses": {
-              "200": {
-                "description": "Retrieves a user name",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "example": {
-                        "username": "johnsmith"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "/-/npm/v1/tokens": {
-          "get": {
-            "tags": ["Tokens"],
-            "summary": "Get Token Profile",
-            "description": `Get tokens for the associative authenticated user
-
-\`\`\`bash
-$ npm token list
-<token-type> token <partial-token>\u2026 with id <uuid> created <date-created>
-\`\`\``,
-            "responses": {
-              "200": {
-                "description": "Token Profile",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "example": {
-                        "objects": [
-                          {
-                            "cidr_whitelist": null,
-                            "readonly": false,
-                            "automation": null,
-                            "created": null,
-                            "updated": null,
-                            "scope": [
-                              {
-                                "values": [
-                                  "*"
-                                ],
-                                "types": {
-                                  "pkg": {
-                                    "read": true,
-                                    "write": true
-                                  }
-                                }
-                              },
-                              {
-                                "values": [
-                                  "*"
-                                ],
-                                "types": {
-                                  "user": {
-                                    "read": true,
-                                    "write": true
-                                  }
-                                }
-                              }
-                            ],
-                            "key": "fff00131-d831-4517-84c0-1b53b1c85ba9",
-                            "token": "a67a46ad-fe51-4fde-94fe-c56ee00fd638"
-                          }
-                        ],
-                        "urls": {}
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "post": {
-            "tags": ["Tokens"],
-            "summary": "Create Token",
-            "description": "Creates a token for authenticated user or provided UUID user (later requires global read+write user scope)",
-            "headers": {
-              "Authorization": {
-                "description": "The number of allowed requests in the current period",
-                "schema": {
-                  "type": "Authorization",
-                  "bearerFormat": "Bearer <token>"
-                }
-              }
-            },
-            "requestBody": {
-              "description": "Scope of access/scopes for the new token",
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "example": {
-                      "uuid": "admin",
-                      "scope": [
-                        {
-                          "values": ["*"],
-                          "types": { "pkg": { "read": true, "write": false } }
-                        },
-                        {
-                          "values": [
-                            "~admin"
-                          ],
-                          "types": {
-                            "user": {
-                              "read": true,
-                              "write": true
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            },
-            "responses": {
-              "201": {
-                "description": "Token created",
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "example": {
-                        "uuid": "admin",
-                        "token": "1ef5f713-15ff-6491-b62d-d16f6f04e6ac",
-                        "scope": [
-                          {
-                            "values": [
-                              "*"
-                            ],
-                            "types": {
-                              "pkg": {
-                                "read": true,
-                                "write": false
-                              }
-                            }
-                          },
-                          {
-                            "values": [
-                              "~admin"
-                            ],
-                            "types": {
-                              "user": {
-                                "read": true,
-                                "write": true
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "put": {
-            "tags": ["Tokens"],
-            "summary": "Update Token",
-            "description": "Update a token by the token itself",
-            "responses": {
-              "200": {
-                "description": "Token updated"
-              }
-            }
-          },
-          "delete": {
-            "tags": ["Tokens"],
-            "summary": "Delete Token by Auth",
-            "description": `Revokes a token for the associative authenticated user
-
-\`\`\`bash
-$ npm token revoke <token>
-\`\`\``,
-            "responses": {
-              "204": {
-                "description": "Token Deleted Response"
-              }
-            }
-          }
-        },
-        "/-/npm/v1/tokens/token/{uuid}": {
-          "delete": {
-            "tags": ["Tokens"],
-            "summary": "Delete Token by UUID",
-            "description": "Delete a token by the token UUID",
-            "parameters": [
-              {
-                "in": "path",
-                "name": "uuid",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "responses": {
-              "204": {
-                "description": "Token deleted"
-              }
-            }
-          }
-        },
-        "/{package-name}": {
-          "get": {
-            "tags": ["Packages"],
-            "summary": "Get Package Packument",
-            "description": "Returns all published packages & metadata for the specific package name",
-            "parameters": [
-              {
-                "in": "path",
-                "name": "scope",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "package-name",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "Package packument"
-              },
-              "404": {
-                "description": "Not found"
-              }
-            }
-          },
-          "put": {
-            "tags": ["Packages"],
-            "summary": "Publish Package",
-            "parameters": [
-              {
-                "in": "path",
-                "name": "scope",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "package-name",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "requestBody": {
-              "description": "Package data",
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object"
-                  }
-                }
-              }
-            },
-            "responses": {
-              "200": {
-                "description": "Package published"
-              },
-              "400": {
-                "description": "Invalid request"
-              },
-              "409": {
-                "description": "Conflict"
-              }
-            }
-          }
-        },
-        "/{package-name}/{version}": {
-          "get": {
-            "tags": ["Packages"],
-            "summary": "Get Package Manifest",
-            "description": "Returns the full package manifest for a specific package version",
-            "parameters": [
-              {
-                "in": "path",
-                "name": "scope",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "package-name",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "version",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "Package manifest"
-              },
-              "404": {
-                "description": "Not found"
-              }
-            }
-          }
-        },
-        "/{package-name}/-/{tarball}": {
-          "get": {
-            "tags": ["Packages"],
-            "summary": "Get Package Tarball",
-            "parameters": [
-              {
-                "in": "path",
-                "name": "scope",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "package-name",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              },
-              {
-                "in": "path",
-                "name": "tarball",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            ],
-            "responses": {
-              "200": {
-                "description": "Package tarball"
-              },
-              "404": {
-                "description": "Not found"
-              }
-            }
-          }
-        }
-      },
-      "securitySchemes": {
-        "bearerAuth": {
-          "type": "http",
-          "scheme": "bearer"
-        },
-        "basicAuth": {
-          "type": "http",
-          "scheme": "basic"
-        },
-        "apiKeyHeader": {
-          "type": "apiKey",
-          "in": "header",
-          "name": "X-API-Key"
-        },
-        "apiKeyQuery": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "api_key"
-        },
-        "apiKeyCookie": {
-          "type": "apiKey",
-          "in": "cookie",
-          "name": "api_key"
-        },
-        "oAuth2": {
-          "type": "oauth2",
-          "flows": {
-            "authorizationCode": {
-              "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
-              "tokenUrl": "https://galaxy.scalar.com/oauth/token",
-              "scopes": {
-                "read:account": "read your account information",
-                "write:planets": "modify planets in your account",
-                "read:planets": "read your planets"
-              }
-            },
-            "clientCredentials": {
-              "tokenUrl": "https://galaxy.scalar.com/oauth/token",
-              "scopes": {
-                "read:account": "read your account information",
-                "write:planets": "modify planets in your account",
-                "read:planets": "read your planets"
-              }
-            },
-            "implicit": {
-              "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
-              "scopes": {
-                "read:account": "read your account information",
-                "write:planets": "modify planets in your account",
-                "read:planets": "read your planets"
-              }
-            },
-            "password": {
-              "tokenUrl": "https://galaxy.scalar.com/oauth/token",
-              "scopes": {
-                "read:account": "read your account information",
-                "write:planets": "modify planets in your account",
-                "read:planets": "read your planets"
-              }
-            }
-          }
-        }
-      },
-      "parameters": {
-        "planetId": {
-          "name": "planetId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "format": "int64",
-            "examples": [
-              1
-            ]
-          }
-        },
-        "limit": {
-          "name": "limit",
-          "in": "query",
-          "description": "The number of items to return",
-          "required": false,
-          "schema": {
-            "type": "integer",
-            "format": "int64",
-            "default": 10
-          }
-        },
-        "offset": {
-          "name": "offset",
-          "in": "query",
-          "description": "The number of items to skip before starting to collect the result set",
-          "required": false,
-          "schema": {
-            "type": "integer",
-            "format": "int64",
-            "default": 0
-          }
-        }
-      },
-      "responses": {
-        "BadRequest": {
-          "description": "Bad Request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Error"
-              }
-            }
-          }
-        },
-        "Forbidden": {
-          "description": "Forbidden",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Error"
-              }
-            }
-          }
-        },
-        "NotFound": {
-          "description": "NotFound",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Error"
-              }
-            }
-          }
-        },
-        "Unauthorized": {
-          "description": "Unauthorized",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Error"
-              }
-            }
-          }
-        }
-      }
-    };
-  }
-});
-
-// node_modules/semver/internal/constants.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/constants.js
 var require_constants = __commonJS({
-  "node_modules/semver/internal/constants.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/constants.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SEMVER_SPEC_VERSION = "2.0.0";
     var MAX_LENGTH = 256;
     var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
@@ -949,18 +70,20 @@ var require_constants = __commonJS({
   }
 });
 
-// node_modules/semver/internal/debug.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/debug.js
 var require_debug = __commonJS({
-  "node_modules/semver/internal/debug.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/debug.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var debug = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
     module.exports = debug;
   }
 });
 
-// node_modules/semver/internal/re.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/re.js
 var require_re = __commonJS({
-  "node_modules/semver/internal/re.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/re.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var {
       MAX_SAFE_COMPONENT_LENGTH,
       MAX_SAFE_BUILD_LENGTH,
@@ -1043,9 +166,10 @@ var require_re = __commonJS({
   }
 });
 
-// node_modules/semver/internal/parse-options.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/parse-options.js
 var require_parse_options = __commonJS({
-  "node_modules/semver/internal/parse-options.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/parse-options.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var looseOption = Object.freeze({ loose: true });
     var emptyOpts = Object.freeze({});
     var parseOptions = /* @__PURE__ */ __name((options) => {
@@ -1061,9 +185,10 @@ var require_parse_options = __commonJS({
   }
 });
 
-// node_modules/semver/internal/identifiers.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/identifiers.js
 var require_identifiers = __commonJS({
-  "node_modules/semver/internal/identifiers.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/identifiers.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = /* @__PURE__ */ __name((a, b) => {
       const anum = numeric.test(a);
@@ -1082,9 +207,10 @@ var require_identifiers = __commonJS({
   }
 });
 
-// node_modules/semver/classes/semver.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/semver.js
 var require_semver = __commonJS({
-  "node_modules/semver/classes/semver.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/semver.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var debug = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants();
     var { safeRe: re, t } = require_re();
@@ -1325,9 +451,10 @@ var require_semver = __commonJS({
   }
 });
 
-// node_modules/semver/functions/parse.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/parse.js
 var require_parse = __commonJS({
-  "node_modules/semver/functions/parse.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/parse.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var parse = /* @__PURE__ */ __name((version, options, throwErrors = false) => {
       if (version instanceof SemVer) {
@@ -1346,9 +473,10 @@ var require_parse = __commonJS({
   }
 });
 
-// node_modules/semver/functions/valid.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/valid.js
 var require_valid = __commonJS({
-  "node_modules/semver/functions/valid.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/valid.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var parse = require_parse();
     var valid = /* @__PURE__ */ __name((version, options) => {
       const v = parse(version, options);
@@ -1358,9 +486,10 @@ var require_valid = __commonJS({
   }
 });
 
-// node_modules/semver/functions/clean.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/clean.js
 var require_clean = __commonJS({
-  "node_modules/semver/functions/clean.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/clean.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var parse = require_parse();
     var clean = /* @__PURE__ */ __name((version, options) => {
       const s = parse(version.trim().replace(/^[=v]+/, ""), options);
@@ -1370,9 +499,10 @@ var require_clean = __commonJS({
   }
 });
 
-// node_modules/semver/functions/inc.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/inc.js
 var require_inc = __commonJS({
-  "node_modules/semver/functions/inc.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/inc.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var inc = /* @__PURE__ */ __name((version, release, options, identifier, identifierBase) => {
       if (typeof options === "string") {
@@ -1393,9 +523,10 @@ var require_inc = __commonJS({
   }
 });
 
-// node_modules/semver/functions/diff.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/diff.js
 var require_diff = __commonJS({
-  "node_modules/semver/functions/diff.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/diff.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var parse = require_parse();
     var diff = /* @__PURE__ */ __name((version1, version2) => {
       const v1 = parse(version1, null, true);
@@ -1437,36 +568,40 @@ var require_diff = __commonJS({
   }
 });
 
-// node_modules/semver/functions/major.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/major.js
 var require_major = __commonJS({
-  "node_modules/semver/functions/major.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/major.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var major = /* @__PURE__ */ __name((a, loose) => new SemVer(a, loose).major, "major");
     module.exports = major;
   }
 });
 
-// node_modules/semver/functions/minor.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/minor.js
 var require_minor = __commonJS({
-  "node_modules/semver/functions/minor.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/minor.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var minor = /* @__PURE__ */ __name((a, loose) => new SemVer(a, loose).minor, "minor");
     module.exports = minor;
   }
 });
 
-// node_modules/semver/functions/patch.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/patch.js
 var require_patch = __commonJS({
-  "node_modules/semver/functions/patch.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/patch.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var patch = /* @__PURE__ */ __name((a, loose) => new SemVer(a, loose).patch, "patch");
     module.exports = patch;
   }
 });
 
-// node_modules/semver/functions/prerelease.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/prerelease.js
 var require_prerelease = __commonJS({
-  "node_modules/semver/functions/prerelease.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/prerelease.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var parse = require_parse();
     var prerelease = /* @__PURE__ */ __name((version, options) => {
       const parsed = parse(version, options);
@@ -1476,36 +611,40 @@ var require_prerelease = __commonJS({
   }
 });
 
-// node_modules/semver/functions/compare.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare.js
 var require_compare = __commonJS({
-  "node_modules/semver/functions/compare.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var compare = /* @__PURE__ */ __name((a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose)), "compare");
     module.exports = compare;
   }
 });
 
-// node_modules/semver/functions/rcompare.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/rcompare.js
 var require_rcompare = __commonJS({
-  "node_modules/semver/functions/rcompare.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/rcompare.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var rcompare = /* @__PURE__ */ __name((a, b, loose) => compare(b, a, loose), "rcompare");
     module.exports = rcompare;
   }
 });
 
-// node_modules/semver/functions/compare-loose.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare-loose.js
 var require_compare_loose = __commonJS({
-  "node_modules/semver/functions/compare-loose.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare-loose.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var compareLoose = /* @__PURE__ */ __name((a, b) => compare(a, b, true), "compareLoose");
     module.exports = compareLoose;
   }
 });
 
-// node_modules/semver/functions/compare-build.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare-build.js
 var require_compare_build = __commonJS({
-  "node_modules/semver/functions/compare-build.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/compare-build.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var compareBuild = /* @__PURE__ */ __name((a, b, loose) => {
       const versionA = new SemVer(a, loose);
@@ -1516,81 +655,90 @@ var require_compare_build = __commonJS({
   }
 });
 
-// node_modules/semver/functions/sort.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/sort.js
 var require_sort = __commonJS({
-  "node_modules/semver/functions/sort.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/sort.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compareBuild = require_compare_build();
     var sort = /* @__PURE__ */ __name((list, loose) => list.sort((a, b) => compareBuild(a, b, loose)), "sort");
     module.exports = sort;
   }
 });
 
-// node_modules/semver/functions/rsort.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/rsort.js
 var require_rsort = __commonJS({
-  "node_modules/semver/functions/rsort.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/rsort.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compareBuild = require_compare_build();
     var rsort = /* @__PURE__ */ __name((list, loose) => list.sort((a, b) => compareBuild(b, a, loose)), "rsort");
     module.exports = rsort;
   }
 });
 
-// node_modules/semver/functions/gt.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/gt.js
 var require_gt = __commonJS({
-  "node_modules/semver/functions/gt.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/gt.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var gt = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) > 0, "gt");
     module.exports = gt;
   }
 });
 
-// node_modules/semver/functions/lt.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/lt.js
 var require_lt = __commonJS({
-  "node_modules/semver/functions/lt.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/lt.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var lt = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) < 0, "lt");
     module.exports = lt;
   }
 });
 
-// node_modules/semver/functions/eq.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/eq.js
 var require_eq = __commonJS({
-  "node_modules/semver/functions/eq.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/eq.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var eq = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) === 0, "eq");
     module.exports = eq;
   }
 });
 
-// node_modules/semver/functions/neq.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/neq.js
 var require_neq = __commonJS({
-  "node_modules/semver/functions/neq.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/neq.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var neq = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) !== 0, "neq");
     module.exports = neq;
   }
 });
 
-// node_modules/semver/functions/gte.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/gte.js
 var require_gte = __commonJS({
-  "node_modules/semver/functions/gte.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/gte.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var gte = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) >= 0, "gte");
     module.exports = gte;
   }
 });
 
-// node_modules/semver/functions/lte.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/lte.js
 var require_lte = __commonJS({
-  "node_modules/semver/functions/lte.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/lte.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var compare = require_compare();
     var lte = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) <= 0, "lte");
     module.exports = lte;
   }
 });
 
-// node_modules/semver/functions/cmp.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/cmp.js
 var require_cmp = __commonJS({
-  "node_modules/semver/functions/cmp.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/cmp.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var eq = require_eq();
     var neq = require_neq();
     var gt = require_gt();
@@ -1637,9 +785,10 @@ var require_cmp = __commonJS({
   }
 });
 
-// node_modules/semver/functions/coerce.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/coerce.js
 var require_coerce = __commonJS({
-  "node_modules/semver/functions/coerce.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/coerce.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var parse = require_parse();
     var { safeRe: re, t } = require_re();
@@ -1682,9 +831,10 @@ var require_coerce = __commonJS({
   }
 });
 
-// node_modules/semver/internal/lrucache.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/lrucache.js
 var require_lrucache = __commonJS({
-  "node_modules/semver/internal/lrucache.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/internal/lrucache.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var LRUCache = class {
       constructor() {
         this.max = 1e3;
@@ -1720,9 +870,10 @@ var require_lrucache = __commonJS({
   }
 });
 
-// node_modules/semver/classes/range.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/range.js
 var require_range = __commonJS({
-  "node_modules/semver/classes/range.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/range.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SPACE_CHARACTERS = /\s+/g;
     var Range = class {
       constructor(range, options) {
@@ -2096,9 +1247,10 @@ var require_range = __commonJS({
   }
 });
 
-// node_modules/semver/classes/comparator.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/comparator.js
 var require_comparator = __commonJS({
-  "node_modules/semver/classes/comparator.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/classes/comparator.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var ANY = Symbol("SemVer ANY");
     var Comparator = class {
       static get ANY() {
@@ -2209,9 +1361,10 @@ var require_comparator = __commonJS({
   }
 });
 
-// node_modules/semver/functions/satisfies.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/satisfies.js
 var require_satisfies = __commonJS({
-  "node_modules/semver/functions/satisfies.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/functions/satisfies.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var Range = require_range();
     var satisfies = /* @__PURE__ */ __name((version, range, options) => {
       try {
@@ -2225,18 +1378,20 @@ var require_satisfies = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/to-comparators.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/to-comparators.js
 var require_to_comparators = __commonJS({
-  "node_modules/semver/ranges/to-comparators.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/to-comparators.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var Range = require_range();
     var toComparators = /* @__PURE__ */ __name((range, options) => new Range(range, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" ")), "toComparators");
     module.exports = toComparators;
   }
 });
 
-// node_modules/semver/ranges/max-satisfying.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/max-satisfying.js
 var require_max_satisfying = __commonJS({
-  "node_modules/semver/ranges/max-satisfying.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/max-satisfying.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var Range = require_range();
     var maxSatisfying = /* @__PURE__ */ __name((versions, range, options) => {
@@ -2262,9 +1417,10 @@ var require_max_satisfying = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/min-satisfying.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/min-satisfying.js
 var require_min_satisfying = __commonJS({
-  "node_modules/semver/ranges/min-satisfying.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/min-satisfying.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var Range = require_range();
     var minSatisfying = /* @__PURE__ */ __name((versions, range, options) => {
@@ -2290,9 +1446,10 @@ var require_min_satisfying = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/min-version.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/min-version.js
 var require_min_version = __commonJS({
-  "node_modules/semver/ranges/min-version.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/min-version.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var Range = require_range();
     var gt = require_gt();
@@ -2346,9 +1503,10 @@ var require_min_version = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/valid.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/valid.js
 var require_valid2 = __commonJS({
-  "node_modules/semver/ranges/valid.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/valid.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var Range = require_range();
     var validRange = /* @__PURE__ */ __name((range, options) => {
       try {
@@ -2361,9 +1519,10 @@ var require_valid2 = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/outside.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/outside.js
 var require_outside = __commonJS({
-  "node_modules/semver/ranges/outside.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/outside.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var SemVer = require_semver();
     var Comparator = require_comparator();
     var { ANY } = Comparator;
@@ -2429,27 +1588,30 @@ var require_outside = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/gtr.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/gtr.js
 var require_gtr = __commonJS({
-  "node_modules/semver/ranges/gtr.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/gtr.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var outside = require_outside();
     var gtr = /* @__PURE__ */ __name((version, range, options) => outside(version, range, ">", options), "gtr");
     module.exports = gtr;
   }
 });
 
-// node_modules/semver/ranges/ltr.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/ltr.js
 var require_ltr = __commonJS({
-  "node_modules/semver/ranges/ltr.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/ltr.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var outside = require_outside();
     var ltr = /* @__PURE__ */ __name((version, range, options) => outside(version, range, "<", options), "ltr");
     module.exports = ltr;
   }
 });
 
-// node_modules/semver/ranges/intersects.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/intersects.js
 var require_intersects = __commonJS({
-  "node_modules/semver/ranges/intersects.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/intersects.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var Range = require_range();
     var intersects = /* @__PURE__ */ __name((r1, r2, options) => {
       r1 = new Range(r1, options);
@@ -2460,9 +1622,10 @@ var require_intersects = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/simplify.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/simplify.js
 var require_simplify = __commonJS({
-  "node_modules/semver/ranges/simplify.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/simplify.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var satisfies = require_satisfies();
     var compare = require_compare();
     module.exports = (versions, range, options) => {
@@ -2509,9 +1672,10 @@ var require_simplify = __commonJS({
   }
 });
 
-// node_modules/semver/ranges/subset.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/subset.js
 var require_subset = __commonJS({
-  "node_modules/semver/ranges/subset.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/ranges/subset.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var Range = require_range();
     var Comparator = require_comparator();
     var { ANY } = Comparator;
@@ -2671,9 +1835,10 @@ var require_subset = __commonJS({
   }
 });
 
-// node_modules/semver/index.js
+// node_modules/.pnpm/semver@7.6.3/node_modules/semver/index.js
 var require_semver2 = __commonJS({
-  "node_modules/semver/index.js"(exports, module) {
+  "node_modules/.pnpm/semver@7.6.3/node_modules/semver/index.js"(exports, module) {
+    init_define_DMNO_INJECTED_CONFIG();
     var internalRe = require_re();
     var constants = require_constants();
     var SemVer = require_semver();
@@ -2765,10 +1930,11 @@ var require_semver2 = __commonJS({
   }
 });
 
-// node_modules/builtins/index.js
+// node_modules/.pnpm/builtins@5.1.0/node_modules/builtins/index.js
 var require_builtins = __commonJS({
-  "node_modules/builtins/index.js"(exports, module) {
+  "node_modules/.pnpm/builtins@5.1.0/node_modules/builtins/index.js"(exports, module) {
     "use strict";
+    init_define_DMNO_INJECTED_CONFIG();
     var satisfies = require_satisfies();
     var permanentModules = [
       "assert",
@@ -2840,10 +2006,11 @@ var require_builtins = __commonJS({
   }
 });
 
-// node_modules/validate-npm-package-name/lib/index.js
+// node_modules/.pnpm/validate-npm-package-name@5.0.0/node_modules/validate-npm-package-name/lib/index.js
 var require_lib = __commonJS({
-  "node_modules/validate-npm-package-name/lib/index.js"(exports, module) {
+  "node_modules/.pnpm/validate-npm-package-name@5.0.0/node_modules/validate-npm-package-name/lib/index.js"(exports, module) {
     "use strict";
+    init_define_DMNO_INJECTED_CONFIG();
     var scopedPackagePattern = new RegExp("^(?:@([^/]+?)[/])?([^/]+?)$");
     var builtins = require_builtins();
     var blacklist = [
@@ -2929,7 +2096,593 @@ var require_lib = __commonJS({
   }
 });
 
-// node_modules/hono/dist/utils/body.js
+// src/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/dmno@0.0.33_@types+node@22.10.2/node_modules/dmno/dist/globals-injector-standalone/edge/auto-inject.js
+init_define_DMNO_INJECTED_CONFIG();
+var __defProp2 = Object.defineProperty;
+var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+var FORCE_COLOR;
+var NODE_DISABLE_COLORS;
+var NO_COLOR;
+var TERM;
+var isTTY = true;
+if (typeof process !== "undefined") {
+  ({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env || {});
+  isTTY = process.stdout && process.stdout.isTTY;
+}
+var $ = {
+  enabled: !NODE_DISABLE_COLORS && NO_COLOR == null && TERM !== "dumb" && (FORCE_COLOR != null && FORCE_COLOR !== "0" || isTTY),
+  // modifiers
+  reset: init(0, 0),
+  bold: init(1, 22),
+  dim: init(2, 22),
+  italic: init(3, 23),
+  underline: init(4, 24),
+  inverse: init(7, 27),
+  hidden: init(8, 28),
+  strikethrough: init(9, 29),
+  // colors
+  black: init(30, 39),
+  red: init(31, 39),
+  green: init(32, 39),
+  yellow: init(33, 39),
+  blue: init(34, 39),
+  magenta: init(35, 39),
+  cyan: init(36, 39),
+  white: init(37, 39),
+  gray: init(90, 39),
+  grey: init(90, 39),
+  // background colors
+  bgBlack: init(40, 49),
+  bgRed: init(41, 49),
+  bgGreen: init(42, 49),
+  bgYellow: init(43, 49),
+  bgBlue: init(44, 49),
+  bgMagenta: init(45, 49),
+  bgCyan: init(46, 49),
+  bgWhite: init(47, 49)
+};
+function run(arr, str) {
+  let i = 0, tmp, beg = "", end = "";
+  for (; i < arr.length; i++) {
+    tmp = arr[i];
+    beg += tmp.open;
+    end += tmp.close;
+    if (!!~str.indexOf(tmp.close)) {
+      str = str.replace(tmp.rgx, tmp.close + tmp.open);
+    }
+  }
+  return beg + str + end;
+}
+__name(run, "run");
+__name2(run, "run");
+function chain(has, keys) {
+  let ctx = { has, keys };
+  ctx.reset = $.reset.bind(ctx);
+  ctx.bold = $.bold.bind(ctx);
+  ctx.dim = $.dim.bind(ctx);
+  ctx.italic = $.italic.bind(ctx);
+  ctx.underline = $.underline.bind(ctx);
+  ctx.inverse = $.inverse.bind(ctx);
+  ctx.hidden = $.hidden.bind(ctx);
+  ctx.strikethrough = $.strikethrough.bind(ctx);
+  ctx.black = $.black.bind(ctx);
+  ctx.red = $.red.bind(ctx);
+  ctx.green = $.green.bind(ctx);
+  ctx.yellow = $.yellow.bind(ctx);
+  ctx.blue = $.blue.bind(ctx);
+  ctx.magenta = $.magenta.bind(ctx);
+  ctx.cyan = $.cyan.bind(ctx);
+  ctx.white = $.white.bind(ctx);
+  ctx.gray = $.gray.bind(ctx);
+  ctx.grey = $.grey.bind(ctx);
+  ctx.bgBlack = $.bgBlack.bind(ctx);
+  ctx.bgRed = $.bgRed.bind(ctx);
+  ctx.bgGreen = $.bgGreen.bind(ctx);
+  ctx.bgYellow = $.bgYellow.bind(ctx);
+  ctx.bgBlue = $.bgBlue.bind(ctx);
+  ctx.bgMagenta = $.bgMagenta.bind(ctx);
+  ctx.bgCyan = $.bgCyan.bind(ctx);
+  ctx.bgWhite = $.bgWhite.bind(ctx);
+  return ctx;
+}
+__name(chain, "chain");
+__name2(chain, "chain");
+function init(open, close) {
+  let blk = {
+    open: `\x1B[${open}m`,
+    close: `\x1B[${close}m`,
+    rgx: new RegExp(`\\x1b\\[${close}m`, "g")
+  };
+  return function(txt) {
+    if (this !== void 0 && this.has !== void 0) {
+      !!~this.has.indexOf(open) || (this.has.push(open), this.keys.push(blk));
+      return txt === void 0 ? this : $.enabled ? run(this.keys, txt + "") : txt + "";
+    }
+    return txt === void 0 ? chain([open], [blk]) : $.enabled ? run([blk], txt + "") : txt + "";
+  };
+}
+__name(init, "init");
+__name2(init, "init");
+var kleur_default = $;
+var UNMASK_STR = "\u{1F441}";
+function buildRedactionRegex(lookup) {
+  if (!lookup || !Object.keys(lookup).length)
+    return;
+  const redactionMap = {};
+  for (const key in lookup)
+    redactionMap[lookup[key].value] = lookup[key].redacted;
+  const findRegex = new RegExp(
+    [
+      `(${UNMASK_STR})?`,
+      "(",
+      Object.keys(redactionMap).map((s) => s.replace(/[()[\]{}*+?^$|#.,/\\\s-]/g, "\\$&")).sort((a, b) => b.length - a.length).join("|"),
+      ")",
+      `(${UNMASK_STR})?`
+    ].join(""),
+    "g"
+  );
+  const replaceFn = /* @__PURE__ */ __name2((match, pre, val, post) => {
+    if (pre && post)
+      return val;
+    return redactionMap[val];
+  }, "replaceFn");
+  return { findRegex, replaceFn };
+}
+__name(buildRedactionRegex, "buildRedactionRegex");
+__name2(buildRedactionRegex, "buildRedactionRegex");
+function resetSensitiveConfigRedactor() {
+  globalThis._dmnoRedactorData = buildRedactionRegex(globalThis._DMNO_SENSITIVE_LOOKUP);
+}
+__name(resetSensitiveConfigRedactor, "resetSensitiveConfigRedactor");
+__name2(resetSensitiveConfigRedactor, "resetSensitiveConfigRedactor");
+var LOG_METHODS = ["trace", "debug", "info", "log", "info", "warn", "error"];
+function patchGlobalConsoleToRedactSensitiveLogs() {
+  const redactor = globalThis._dmnoRedactorData;
+  if (!redactor)
+    return;
+  const kWriteToConsoleSymbol = Object.getOwnPropertySymbols(globalThis.console).find((s) => s.description === "kWriteToConsole");
+  globalThis._dmnoOrigWriteToConsoleFn ||= globalThis.console[kWriteToConsoleSymbol];
+  globalThis.console[kWriteToConsoleSymbol] = function() {
+    globalThis._dmnoOrigWriteToConsoleFn.apply(this, [
+      arguments[0],
+      redactSensitiveConfig(arguments[1]),
+      arguments[2]
+    ]);
+  };
+  if (
+    // !console.log.toString().includes('[native code]') &&
+    !console.log._dmnoPatchedFn
+  ) {
+    for (const logMethodName of LOG_METHODS) {
+      const originalLogMethod = globalThis.console[logMethodName];
+      const patchedFn = /* @__PURE__ */ __name2(function() {
+        originalLogMethod.apply(this, Array.from(arguments).map(redactSensitiveConfig));
+      }, "patchedFn");
+      patchedFn._dmnoPatchedFn = true;
+      globalThis.console[logMethodName] = patchedFn;
+    }
+  }
+}
+__name(patchGlobalConsoleToRedactSensitiveLogs, "patchGlobalConsoleToRedactSensitiveLogs");
+__name2(patchGlobalConsoleToRedactSensitiveLogs, "patchGlobalConsoleToRedactSensitiveLogs");
+function unpatchGlobalConsoleSensitiveLogRedaction() {
+  if (!globalThis._dmnoOrigWriteToConsoleFn)
+    return;
+  const kWriteToConsoleSymbol = Object.getOwnPropertySymbols(globalThis.console).find((s) => s.description === "kWriteToConsole");
+  globalThis.console[kWriteToConsoleSymbol] = globalThis._dmnoOrigWriteToConsoleFn;
+  delete globalThis._dmnoOrigWriteToConsoleFn;
+}
+__name(unpatchGlobalConsoleSensitiveLogRedaction, "unpatchGlobalConsoleSensitiveLogRedaction");
+__name2(unpatchGlobalConsoleSensitiveLogRedaction, "unpatchGlobalConsoleSensitiveLogRedaction");
+function redactSensitiveConfig(o) {
+  const redactor = globalThis._dmnoRedactorData;
+  if (!redactor)
+    return o;
+  if (!o)
+    return o;
+  if (Array.isArray(o)) {
+    return o.map(redactSensitiveConfig);
+  }
+  if (o && typeof o === "object" && Object.getPrototypeOf(o) === Object.prototype) {
+    try {
+      return JSON.parse(redactSensitiveConfig(JSON.stringify(o)));
+    } catch (err) {
+      return o;
+    }
+  }
+  const type = typeof o;
+  if (type === "string" || type === "object" && Object.prototype.toString.call(o) === "[object String]") {
+    return o.replaceAll(redactor.findRegex, redactor.replaceFn);
+  }
+  return o;
+}
+__name(redactSensitiveConfig, "redactSensitiveConfig");
+__name2(redactSensitiveConfig, "redactSensitiveConfig");
+function redactString(valStr, mode, hideLength = true) {
+  if (!valStr)
+    return valStr;
+  const hiddenLength = hideLength ? 5 : valStr.length - 2;
+  const hiddenStr = "\u2592".repeat(hiddenLength);
+  if (mode === "show_last_2") {
+    return `${hiddenStr}${valStr.substring(valStr.length - 2, valStr.length)}`;
+  } else if (mode === "show_first_last") {
+    return `${valStr.substring(0, 1)}${hiddenStr}${valStr.substring(valStr.length - 1, valStr.length)}`;
+  } else {
+    return `${valStr.substring(0, 2)}${hiddenStr}`;
+  }
+}
+__name(redactString, "redactString");
+__name2(redactString, "redactString");
+var splitPatternRegex = /(?:(.*):\/\/)?([^/]+)(\/.*)?/;
+var patternRegexCache = {};
+function buildRegexFromDomainPattern(pattern) {
+  const patternParts = pattern.match(splitPatternRegex);
+  if (!patternParts) {
+    throw new Error(`Unable to parse domain pattern - ${pattern}`);
+  }
+  let [, protocol, domain, path] = patternParts;
+  if (protocol === "*" || !protocol) {
+    protocol = "[a-z+]+";
+  }
+  domain = domain.replaceAll("*", "[^/]+");
+  if (!path)
+    path = "(/.*)?";
+  else
+    path = path.replaceAll("*", ".*");
+  path += "(\\?.*)?";
+  const regexString = `${protocol}://${domain}${path}`;
+  return new RegExp(regexString, "i");
+}
+__name(buildRegexFromDomainPattern, "buildRegexFromDomainPattern");
+__name2(buildRegexFromDomainPattern, "buildRegexFromDomainPattern");
+function checkUrlMatchesPattern(url, allowPattern) {
+  if (allowPattern === "*")
+    return true;
+  const patternRegex = patternRegexCache[allowPattern] || buildRegexFromDomainPattern(allowPattern);
+  return patternRegex.test(url);
+}
+__name(checkUrlMatchesPattern, "checkUrlMatchesPattern");
+__name2(checkUrlMatchesPattern, "checkUrlMatchesPattern");
+function checkUrlInAllowList(url, allowedList) {
+  for (const allowedListItem of allowedList) {
+    if (url.includes(allowedListItem))
+      return true;
+    if (checkUrlMatchesPattern(url, allowedListItem))
+      return true;
+  }
+  return false;
+}
+__name(checkUrlInAllowList, "checkUrlInAllowList");
+__name2(checkUrlInAllowList, "checkUrlInAllowList");
+function buildSensitiveValuesLoookup(lookup) {
+  const valueLookup = {};
+  if (!lookup || !Object.keys(lookup).length)
+    return { regex: false, lookup: {} };
+  for (const key in lookup) {
+    valueLookup[lookup[key].value] = {
+      key,
+      allowedDomains: lookup[key].allowedDomains || []
+    };
+  }
+  const findRegex = new RegExp(
+    Object.keys(valueLookup).map((s) => s.replace(/[()[\]{}*+?^$|#.,/\\\s-]/g, "\\$&")).sort((a, b) => b.length - a.length).join("|"),
+    "g"
+  );
+  return { regex: findRegex, lookup: valueLookup };
+}
+__name(buildSensitiveValuesLoookup, "buildSensitiveValuesLoookup");
+__name2(buildSensitiveValuesLoookup, "buildSensitiveValuesLoookup");
+function dmnoPatchedFetch(...args) {
+  if (dmnoPatchedFetch._dmnoSensitiveRegex) {
+    const [urlOrFetchOpts, fetchOptsArg] = args;
+    const fetchOpts = (typeof urlOrFetchOpts === "object" ? urlOrFetchOpts : fetchOptsArg) || {};
+    const fetchUrl = (typeof urlOrFetchOpts === "object" ? urlOrFetchOpts.url : urlOrFetchOpts).toString();
+    const objToCheckAsString = JSON.stringify(fetchOpts);
+    const matches = objToCheckAsString.match(dmnoPatchedFetch._dmnoSensitiveRegex);
+    for (const match of matches || []) {
+      const matchedItem = dmnoPatchedFetch._dmnoSensitiveLookup[match];
+      if (checkUrlInAllowList(fetchUrl, matchedItem.allowedDomains))
+        continue;
+      console.error([
+        "",
+        `\u{1F6D1} ${kleur_default.bgRed(" SENSITIVE CONFIG LEAK INTERCEPTED ")} \u{1F6D1}`,
+        ` > request url: ${kleur_default.green(fetchUrl)}`,
+        ` > config key: ${kleur_default.blue(matchedItem.key)}`,
+        matchedItem.allowedDomains.length ? ` > allowed domains: ${kleur_default.magenta(matchedItem.allowedDomains.join(", "))}` : ` > allowed domains: ${kleur_default.gray().italic("none")}`,
+        ""
+      ].join("\n"));
+      throw new Error(`\u{1F6D1} SECRET LEAK DETECTED! - ${matchedItem.key} was stopped from being sent to ${fetchUrl}`);
+    }
+  }
+  return dmnoPatchedFetch._unpatchedFetch.apply(this, args);
+}
+__name(dmnoPatchedFetch, "dmnoPatchedFetch");
+__name2(dmnoPatchedFetch, "dmnoPatchedFetch");
+function enableHttpInterceptor() {
+  const { regex, lookup } = buildSensitiveValuesLoookup(globalThis._DMNO_SENSITIVE_LOOKUP);
+  const fetchAlreadyPatched = Object.getOwnPropertyDescriptor(globalThis.fetch, "_patchedByDmno");
+  if (fetchAlreadyPatched) {
+  } else {
+    const unpatchedFetch = globalThis.fetch;
+    dmnoPatchedFetch._unpatchedFetch = unpatchedFetch;
+    dmnoPatchedFetch._patchedByDmno = true;
+    Object.defineProperty(dmnoPatchedFetch, "_patchedByDmno", { value: true });
+    globalThis.fetch = dmnoPatchedFetch;
+  }
+  dmnoPatchedFetch._dmnoSensitiveRegex = regex;
+  dmnoPatchedFetch._dmnoSensitiveLookup = lookup;
+}
+__name(enableHttpInterceptor, "enableHttpInterceptor");
+__name2(enableHttpInterceptor, "enableHttpInterceptor");
+function disableHttpInterceptor() {
+  if (globalThis.fetch._unpatchedFetch) {
+    globalThis.fetch = globalThis.fetch._unpatchedFetch;
+  }
+}
+__name(disableHttpInterceptor, "disableHttpInterceptor");
+__name2(disableHttpInterceptor, "disableHttpInterceptor");
+function patchResponseToPreventClientLeaks() {
+  if (globalThis.Response._patchedByDmno) {
+    return;
+  }
+  const _UnpatchedResponse = globalThis.Response;
+  globalThis.Response = /* @__PURE__ */ __name(class DmnoPatchedResponse extends _UnpatchedResponse {
+    static {
+      __name2(this, "DmnoPatchedResponse");
+    }
+    static _patchedByDmno = true;
+    constructor(body, init2) {
+      super(globalThis._dmnoLeakScan(body, { method: "patched Response constructor" }), init2);
+    }
+    static json(data, init2) {
+      globalThis._dmnoLeakScan(JSON.stringify(data), { method: "patched Response.json" });
+      const r = _UnpatchedResponse.json(data, init2);
+      Object.setPrototypeOf(r, Response.prototype);
+      return r;
+    }
+  }, "DmnoPatchedResponse");
+}
+__name(patchResponseToPreventClientLeaks, "patchResponseToPreventClientLeaks");
+__name2(patchResponseToPreventClientLeaks, "patchResponseToPreventClientLeaks");
+var processExists = !!globalThis.process;
+var originalProcessEnv = {};
+if (processExists) {
+  try {
+    originalProcessEnv = structuredClone(globalThis.process.env);
+  } catch (err) {
+  }
+}
+var IGNORED_PROXY_KEYS = [
+  "__v_isRef"
+  // vue - see https://github.com/vuejs/core/blob/70773d00985135a50556c61fb9855ed6b930cb82/packages/reactivity/src/ref.ts#L101
+];
+function injectDmnoGlobals(opts) {
+  const sensitiveValueLookup = {};
+  const dynamicKeys = [];
+  const sensitiveKeys = [];
+  const publicDynamicKeys = [];
+  const publicDynamicObj = {};
+  if (opts?.injectedConfig) {
+    globalThis._DMNO_INJECTED_ENV = opts?.injectedConfig;
+  }
+  let injectedDmnoEnv = opts?.injectedConfig;
+  if (!injectedDmnoEnv) {
+    if (globalThis.process?.env.DMNO_INJECTED_ENV) {
+      injectedDmnoEnv = JSON.parse(globalThis.process?.env.DMNO_INJECTED_ENV);
+    } else if (globalThis._DMNO_INJECTED_ENV) {
+      injectedDmnoEnv = globalThis._DMNO_INJECTED_ENV;
+    }
+  }
+  if (!injectedDmnoEnv) {
+    throw new Error("Unable to find `process.env.DMNO_INJECTED_ENV` - run this command via `dmno run` - see https://dmno.dev/docs/reference/cli/run for more info");
+  }
+  if (processExists) {
+    globalThis.process.env = { ...originalProcessEnv };
+  }
+  const rawConfigObj = {};
+  const rawPublicConfigObj = {};
+  const staticReplacements = {
+    dmnoConfig: {},
+    dmnoPublicConfig: {}
+  };
+  for (const itemKey in injectedDmnoEnv) {
+    if (itemKey === "$SETTINGS")
+      continue;
+    const injectedItem = injectedDmnoEnv[itemKey];
+    const val = injectedItem.value;
+    if (processExists) {
+      if (val === void 0 || val === null) {
+        globalThis.process.env[itemKey] ||= "";
+      } else {
+        globalThis.process.env[itemKey] ||= val.toString();
+      }
+    }
+    if (!injectedItem.sensitive) {
+      rawPublicConfigObj[itemKey] = "*";
+      rawConfigObj[itemKey] = "*";
+    } else {
+      sensitiveKeys.push(itemKey);
+      rawConfigObj[itemKey] = "*";
+      if (val) {
+        const valStr = injectedItem.value.toString();
+        sensitiveValueLookup[itemKey] = {
+          value: valStr,
+          redacted: redactString(valStr, injectedItem.redactMode) || "",
+          allowedDomains: injectedItem.allowedDomains
+        };
+      }
+    }
+    if (injectedItem.dynamic) {
+      dynamicKeys.push(itemKey);
+      if (!injectedItem.sensitive) {
+        publicDynamicKeys.push(itemKey);
+        publicDynamicObj[itemKey] = injectedItem.value;
+      }
+    }
+    if (!injectedItem.dynamic) {
+      if (!injectedItem.sensitive) {
+        staticReplacements.dmnoPublicConfig[`DMNO_PUBLIC_CONFIG.${itemKey}`] = JSON.stringify(injectedItem.value);
+      }
+      staticReplacements.dmnoConfig[`DMNO_CONFIG.${itemKey}`] = JSON.stringify(injectedItem.value);
+    }
+  }
+  globalThis.DMNO_CONFIG = new Proxy(rawConfigObj, {
+    get(o, key) {
+      if (typeof key === "symbol")
+        return;
+      if (IGNORED_PROXY_KEYS.includes(key))
+        return;
+      if (opts?.trackingObject)
+        opts.trackingObject[key] = true;
+      if (key in injectedDmnoEnv) {
+        if (opts?.onItemAccess)
+          opts.onItemAccess(injectedDmnoEnv[key]);
+        return injectedDmnoEnv[key].value;
+      }
+      throw new Error(`\u274C ${key} is not a config item (1)`);
+    }
+  });
+  globalThis.DMNO_PUBLIC_CONFIG = new Proxy(rawPublicConfigObj, {
+    get(o, key) {
+      const keyStr = key.toString();
+      if (IGNORED_PROXY_KEYS.includes(keyStr))
+        return;
+      if (opts?.trackingObject)
+        opts.trackingObject[keyStr] = true;
+      if (injectedDmnoEnv[keyStr]?.sensitive) {
+        throw new Error(`\u274C ${keyStr} is not a public config item! Use \`DMNO_CONFIG.${keyStr}\` instead`);
+      }
+      if (key in injectedDmnoEnv) {
+        if (opts?.onItemAccess)
+          opts.onItemAccess(injectedDmnoEnv[keyStr]);
+        return injectedDmnoEnv[keyStr].value;
+      }
+      throw new Error(`\u274C ${keyStr} is not a config item (2)`);
+    }
+  });
+  const serviceSettings = injectedDmnoEnv.$SETTINGS;
+  globalThis._DMNO_SERVICE_SETTINGS = serviceSettings;
+  globalThis._DMNO_PUBLIC_DYNAMIC_KEYS = publicDynamicKeys;
+  globalThis._DMNO_PUBLIC_DYNAMIC_OBJ = publicDynamicObj;
+  globalThis._DMNO_SENSITIVE_LOOKUP = sensitiveValueLookup;
+  globalThis._dmnoRepatchGlobals = repatchGlobals;
+  repatchGlobals();
+  const injectionResult = {
+    staticReplacements,
+    dynamicKeys,
+    publicDynamicKeys,
+    sensitiveKeys,
+    sensitiveValueLookup,
+    serviceSettings,
+    injectedDmnoEnv
+  };
+  return injectionResult;
+}
+__name(injectDmnoGlobals, "injectDmnoGlobals");
+__name2(injectDmnoGlobals, "injectDmnoGlobals");
+function repatchGlobals() {
+  const serviceSettings = globalThis._DMNO_SERVICE_SETTINGS;
+  resetSensitiveConfigRedactor();
+  if (serviceSettings.redactSensitiveLogs) {
+    patchGlobalConsoleToRedactSensitiveLogs();
+  } else {
+    unpatchGlobalConsoleSensitiveLogRedaction();
+  }
+  if (serviceSettings.interceptSensitiveLeakRequests) {
+    enableHttpInterceptor();
+  } else {
+    disableHttpInterceptor();
+  }
+  if (serviceSettings.preventClientLeaks) {
+    if (false) {
+      patchServerResponseToPreventClientLeaks();
+    } else {
+      patchResponseToPreventClientLeaks();
+    }
+  }
+}
+__name(repatchGlobals, "repatchGlobals");
+__name2(repatchGlobals, "repatchGlobals");
+function isString(s) {
+  return Object.prototype.toString.call(s) === "[object String]";
+}
+__name(isString, "isString");
+__name2(isString, "isString");
+globalThis._dmnoRedact = redactSensitiveConfig;
+globalThis._dmnoLeakScan = /* @__PURE__ */ __name2(/* @__PURE__ */ __name(function _dmnoLeakScan(toScan, meta) {
+  function scanStrForLeaks(strToScan) {
+    const sensitiveLookup = globalThis._DMNO_SENSITIVE_LOOKUP;
+    for (const itemKey in sensitiveLookup) {
+      if (strToScan.includes(sensitiveLookup[itemKey].value)) {
+        console.error([
+          // eslint-disable-line no-console
+          "",
+          `\u{1F6A8} ${kleur_default.bgRed(" DETECTED LEAKED SENSITIVE CONFIG ")} \u{1F6A8}`,
+          `> Config item key: ${kleur_default.blue(itemKey)}`,
+          ...meta?.method ? [`> Scan method: ${meta.method}`] : [],
+          ...meta?.file ? [`> File: ${meta.file}`] : [],
+          ""
+        ].join("\n"));
+        throw new Error(`\u{1F6A8} DETECTED LEAKED SENSITIVE CONFIG - ${itemKey}`);
+      }
+    }
+  }
+  __name(scanStrForLeaks, "scanStrForLeaks");
+  __name2(scanStrForLeaks, "scanStrForLeaks");
+  if (isString(toScan)) {
+    scanStrForLeaks(toScan);
+    return toScan;
+  } else if (toScan instanceof ReadableStream) {
+    if (toScan.locked) {
+      return toScan;
+    } else {
+    }
+    const chunkDecoder = new TextDecoder();
+    return toScan.pipeThrough(
+      new TransformStream({
+        transform(chunk, controller) {
+          const chunkStr = chunkDecoder.decode(chunk);
+          scanStrForLeaks(chunkStr);
+          controller.enqueue(chunk);
+        }
+      })
+    );
+  }
+  return toScan;
+}, "_dmnoLeakScan"), "_dmnoLeakScan");
+var defineInjectedConfig;
+try {
+  defineInjectedConfig = define_DMNO_INJECTED_CONFIG_default;
+} catch (err) {
+}
+if (defineInjectedConfig)
+  injectDmnoGlobals({ injectedConfig: defineInjectedConfig });
+else
+  injectDmnoGlobals();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/hono.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/hono-base.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/compose.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/context.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/request.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/body.js
+init_define_DMNO_INJECTED_CONFIG();
 var parseBody = /* @__PURE__ */ __name(async (request, options = /* @__PURE__ */ Object.create(null)) => {
   const { all = false, dot = false } = options;
   const headers = request instanceof HonoRequest ? request.raw.headers : request.headers;
@@ -2996,7 +2749,8 @@ var handleParsingNestedValues = /* @__PURE__ */ __name((form, key, value) => {
   });
 }, "handleParsingNestedValues");
 
-// node_modules/hono/dist/utils/url.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/url.js
+init_define_DMNO_INJECTED_CONFIG();
 var splitPath = /* @__PURE__ */ __name((path) => {
   const paths = path.split("/");
   if (paths[0] === "") {
@@ -3048,19 +2802,20 @@ var getPattern = /* @__PURE__ */ __name((label) => {
   }
   return null;
 }, "getPattern");
-var tryDecodeURI = /* @__PURE__ */ __name((str) => {
+var tryDecode = /* @__PURE__ */ __name((str, decoder) => {
   try {
-    return decodeURI(str);
+    return decoder(str);
   } catch {
     return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match) => {
       try {
-        return decodeURI(match);
+        return decoder(match);
       } catch {
         return match;
       }
     });
   }
-}, "tryDecodeURI");
+}, "tryDecode");
+var tryDecodeURI = /* @__PURE__ */ __name((str) => tryDecode(str, decodeURI), "tryDecodeURI");
 var getPath = /* @__PURE__ */ __name((request) => {
   const url = request.url;
   const start = url.indexOf("/", 8);
@@ -3079,13 +2834,13 @@ var getPath = /* @__PURE__ */ __name((request) => {
 }, "getPath");
 var getPathNoStrict = /* @__PURE__ */ __name((request) => {
   const result = getPath(request);
-  return result.length > 1 && result[result.length - 1] === "/" ? result.slice(0, -1) : result;
+  return result.length > 1 && result.at(-1) === "/" ? result.slice(0, -1) : result;
 }, "getPathNoStrict");
 var mergePath = /* @__PURE__ */ __name((...paths) => {
   let p = "";
   let endsWithSlash = false;
   for (let path of paths) {
-    if (p[p.length - 1] === "/") {
+    if (p.at(-1) === "/") {
       p = p.slice(0, -1);
       endsWithSlash = true;
     }
@@ -3137,7 +2892,7 @@ var _decodeURI = /* @__PURE__ */ __name((value) => {
   if (value.indexOf("+") !== -1) {
     value = value.replace(/\+/g, " ");
   }
-  return /%/.test(value) ? decodeURIComponent_(value) : value;
+  return value.indexOf("%") !== -1 ? decodeURIComponent_(value) : value;
 }, "_decodeURI");
 var _getQueryParam = /* @__PURE__ */ __name((url, key, multiple) => {
   let encoded;
@@ -3209,7 +2964,8 @@ var getQueryParams = /* @__PURE__ */ __name((url, key) => {
 }, "getQueryParams");
 var decodeURIComponent_ = decodeURIComponent;
 
-// node_modules/hono/dist/request.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/request.js
+var tryDecodeURIComponent = /* @__PURE__ */ __name((str) => tryDecode(str, decodeURIComponent_), "tryDecodeURIComponent");
 var HonoRequest = /* @__PURE__ */ __name(class {
   raw;
   #validatedData;
@@ -3224,25 +2980,25 @@ var HonoRequest = /* @__PURE__ */ __name(class {
     this.#validatedData = {};
   }
   param(key) {
-    return key ? this.getDecodedParam(key) : this.getAllDecodedParams();
+    return key ? this.#getDecodedParam(key) : this.#getAllDecodedParams();
   }
-  getDecodedParam(key) {
+  #getDecodedParam(key) {
     const paramKey = this.#matchResult[0][this.routeIndex][1][key];
-    const param = this.getParamValue(paramKey);
-    return param ? /\%/.test(param) ? decodeURIComponent_(param) : param : void 0;
+    const param = this.#getParamValue(paramKey);
+    return param ? /\%/.test(param) ? tryDecodeURIComponent(param) : param : void 0;
   }
-  getAllDecodedParams() {
+  #getAllDecodedParams() {
     const decoded = {};
     const keys = Object.keys(this.#matchResult[0][this.routeIndex][1]);
     for (const key of keys) {
-      const value = this.getParamValue(this.#matchResult[0][this.routeIndex][1][key]);
+      const value = this.#getParamValue(this.#matchResult[0][this.routeIndex][1][key]);
       if (value && typeof value === "string") {
-        decoded[key] = /\%/.test(value) ? decodeURIComponent_(value) : value;
+        decoded[key] = /\%/.test(value) ? tryDecodeURIComponent(value) : value;
       }
     }
     return decoded;
   }
-  getParamValue(paramKey) {
+  #getParamValue(paramKey) {
     return this.#matchResult[1] ? this.#matchResult[1][paramKey] : paramKey;
   }
   query(key) {
@@ -3264,7 +3020,7 @@ var HonoRequest = /* @__PURE__ */ __name(class {
   async parseBody(options) {
     return this.bodyCache.parsedBody ??= await parseBody(this, options);
   }
-  cachedBody = (key) => {
+  #cachedBody = (key) => {
     const { bodyCache, raw: raw2 } = this;
     const cachedBody = bodyCache[key];
     if (cachedBody) {
@@ -3282,19 +3038,19 @@ var HonoRequest = /* @__PURE__ */ __name(class {
     return bodyCache[key] = raw2[key]();
   };
   json() {
-    return this.cachedBody("json");
+    return this.#cachedBody("json");
   }
   text() {
-    return this.cachedBody("text");
+    return this.#cachedBody("text");
   }
   arrayBuffer() {
-    return this.cachedBody("arrayBuffer");
+    return this.#cachedBody("arrayBuffer");
   }
   blob() {
-    return this.cachedBody("blob");
+    return this.#cachedBody("blob");
   }
   formData() {
-    return this.cachedBody("formData");
+    return this.#cachedBody("formData");
   }
   addValidatedData(target, data) {
     this.#validatedData[target] = data;
@@ -3316,7 +3072,8 @@ var HonoRequest = /* @__PURE__ */ __name(class {
   }
 }, "HonoRequest");
 
-// node_modules/hono/dist/utils/html.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/html.js
+init_define_DMNO_INJECTED_CONFIG();
 var HtmlEscapedCallbackPhase = {
   Stringify: 1,
   BeforeStream: 2,
@@ -3432,10 +3189,12 @@ var resolveCallback = /* @__PURE__ */ __name(async (str, phase, preserveCallback
   }
 }, "resolveCallback");
 
-// node_modules/hono/dist/context.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/context.js
 var TEXT_PLAIN = "text/plain; charset=UTF-8";
 var setHeaders = /* @__PURE__ */ __name((headers, map = {}) => {
-  Object.entries(map).forEach(([key, value]) => headers.set(key, value));
+  for (const key of Object.keys(map)) {
+    headers.set(key, map[key]);
+  }
   return headers;
 }, "setHeaders");
 var Context = /* @__PURE__ */ __name(class {
@@ -3582,7 +3341,7 @@ var Context = /* @__PURE__ */ __name(class {
     }
     return Object.fromEntries(this.#var);
   }
-  newResponse = (data, arg, headers) => {
+  #newResponse(data, arg, headers) {
     if (this.#isFresh && !headers && !arg && this.#status === 200) {
       return new Response(data, {
         headers: this.#preparedHeaders
@@ -3634,9 +3393,10 @@ var Context = /* @__PURE__ */ __name(class {
       status,
       headers: this.#headers
     });
-  };
+  }
+  newResponse = (...args) => this.#newResponse(...args);
   body = (data, arg, headers) => {
-    return typeof arg === "number" ? this.newResponse(data, arg, headers) : this.newResponse(data, arg);
+    return typeof arg === "number" ? this.#newResponse(data, arg, headers) : this.#newResponse(data, arg);
   };
   text = (text, arg, headers) => {
     if (!this.#preparedHeaders) {
@@ -3646,27 +3406,27 @@ var Context = /* @__PURE__ */ __name(class {
       this.#preparedHeaders = {};
     }
     this.#preparedHeaders["content-type"] = TEXT_PLAIN;
-    return typeof arg === "number" ? this.newResponse(text, arg, headers) : this.newResponse(text, arg);
+    return typeof arg === "number" ? this.#newResponse(text, arg, headers) : this.#newResponse(text, arg);
   };
   json = (object, arg, headers) => {
     const body = JSON.stringify(object);
     this.#preparedHeaders ??= {};
     this.#preparedHeaders["content-type"] = "application/json; charset=UTF-8";
-    return typeof arg === "number" ? this.newResponse(body, arg, headers) : this.newResponse(body, arg);
+    return typeof arg === "number" ? this.#newResponse(body, arg, headers) : this.#newResponse(body, arg);
   };
   html = (html2, arg, headers) => {
     this.#preparedHeaders ??= {};
     this.#preparedHeaders["content-type"] = "text/html; charset=UTF-8";
     if (typeof html2 === "object") {
       return resolveCallback(html2, HtmlEscapedCallbackPhase.Stringify, false, {}).then((html22) => {
-        return typeof arg === "number" ? this.newResponse(html22, arg, headers) : this.newResponse(html22, arg);
+        return typeof arg === "number" ? this.#newResponse(html22, arg, headers) : this.#newResponse(html22, arg);
       });
     }
-    return typeof arg === "number" ? this.newResponse(html2, arg, headers) : this.newResponse(html2, arg);
+    return typeof arg === "number" ? this.#newResponse(html2, arg, headers) : this.#newResponse(html2, arg);
   };
   redirect = (location, status) => {
     this.#headers ??= new Headers();
-    this.#headers.set("Location", location);
+    this.#headers.set("Location", String(location));
     return this.newResponse(null, status ?? 302);
   };
   notFound = () => {
@@ -3675,10 +3435,11 @@ var Context = /* @__PURE__ */ __name(class {
   };
 }, "Context");
 
-// node_modules/hono/dist/compose.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/compose.js
 var compose = /* @__PURE__ */ __name((middleware, onError, onNotFound) => {
   return (context, next) => {
     let index = -1;
+    const isContext = context instanceof Context;
     return dispatch(0);
     async function dispatch(i) {
       if (i <= index) {
@@ -3690,14 +3451,14 @@ var compose = /* @__PURE__ */ __name((middleware, onError, onNotFound) => {
       let handler;
       if (middleware[i]) {
         handler = middleware[i][0][0];
-        if (context instanceof Context) {
+        if (isContext) {
           context.req.routeIndex = i;
         }
       } else {
         handler = i === middleware.length && next || void 0;
       }
       if (!handler) {
-        if (context instanceof Context && context.finalized === false && onNotFound) {
+        if (isContext && context.finalized === false && onNotFound) {
           res = await onNotFound(context);
         }
       } else {
@@ -3706,7 +3467,7 @@ var compose = /* @__PURE__ */ __name((middleware, onError, onNotFound) => {
             return dispatch(i + 1);
           });
         } catch (err) {
-          if (err instanceof Error && context instanceof Context && onError) {
+          if (err instanceof Error && isContext && onError) {
             context.error = err;
             res = await onError(err, context);
             isError = true;
@@ -3724,7 +3485,8 @@ var compose = /* @__PURE__ */ __name((middleware, onError, onNotFound) => {
   };
 }, "compose");
 
-// node_modules/hono/dist/router.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router.js
+init_define_DMNO_INJECTED_CONFIG();
 var METHOD_NAME_ALL = "ALL";
 var METHOD_NAME_ALL_LOWERCASE = "all";
 var METHODS = ["get", "post", "put", "delete", "options", "patch"];
@@ -3732,7 +3494,7 @@ var MESSAGE_MATCHER_IS_ALREADY_BUILT = "Can not add a route since the matcher is
 var UnsupportedPathError = /* @__PURE__ */ __name(class extends Error {
 }, "UnsupportedPathError");
 
-// node_modules/hono/dist/hono-base.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/hono-base.js
 var COMPOSED_HANDLER = Symbol("composedHandler");
 var notFoundHandler = /* @__PURE__ */ __name((c) => {
   return c.text("404 Not Found", 404);
@@ -3766,12 +3528,10 @@ var Hono = /* @__PURE__ */ __name(class {
         if (typeof args1 === "string") {
           this.#path = args1;
         } else {
-          this.addRoute(method, this.#path, args1);
+          this.#addRoute(method, this.#path, args1);
         }
         args.forEach((handler) => {
-          if (typeof handler !== "string") {
-            this.addRoute(method, this.#path, handler);
-          }
+          this.#addRoute(method, this.#path, handler);
         });
         return this;
       };
@@ -3781,7 +3541,7 @@ var Hono = /* @__PURE__ */ __name(class {
         this.#path = p;
         for (const m of [method].flat()) {
           handlers.map((handler) => {
-            this.addRoute(m.toUpperCase(), this.#path, handler);
+            this.#addRoute(m.toUpperCase(), this.#path, handler);
           });
         }
       }
@@ -3795,7 +3555,7 @@ var Hono = /* @__PURE__ */ __name(class {
         handlers.unshift(arg1);
       }
       handlers.forEach((handler) => {
-        this.addRoute(METHOD_NAME_ALL, this.#path, handler);
+        this.#addRoute(METHOD_NAME_ALL, this.#path, handler);
       });
       return this;
     };
@@ -3804,7 +3564,7 @@ var Hono = /* @__PURE__ */ __name(class {
     Object.assign(this, options);
     this.getPath = strict ? options.getPath ?? getPath : getPathNoStrict;
   }
-  clone() {
+  #clone() {
     const clone = new Hono({
       router: this.router,
       getPath: this.getPath
@@ -3812,7 +3572,7 @@ var Hono = /* @__PURE__ */ __name(class {
     clone.routes = this.routes;
     return clone;
   }
-  notFoundHandler = notFoundHandler;
+  #notFoundHandler = notFoundHandler;
   errorHandler = errorHandler;
   route(path, app2) {
     const subApp = this.basePath(path);
@@ -3824,12 +3584,12 @@ var Hono = /* @__PURE__ */ __name(class {
         handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app2.errorHandler)(c, () => r.handler(c, next))).res, "handler");
         handler[COMPOSED_HANDLER] = r.handler;
       }
-      subApp.addRoute(r.method, r.path, handler);
+      subApp.#addRoute(r.method, r.path, handler);
     });
     return this;
   }
   basePath(path) {
-    const subApp = this.clone();
+    const subApp = this.#clone();
     subApp._basePath = mergePath(this._basePath, path);
     return subApp;
   }
@@ -3838,7 +3598,7 @@ var Hono = /* @__PURE__ */ __name(class {
     return this;
   };
   notFound = (handler) => {
-    this.notFoundHandler = handler;
+    this.#notFoundHandler = handler;
     return this;
   };
   mount(path, applicationHandler, options) {
@@ -3879,52 +3639,49 @@ var Hono = /* @__PURE__ */ __name(class {
       }
       await next();
     }, "handler");
-    this.addRoute(METHOD_NAME_ALL, mergePath(path, "*"), handler);
+    this.#addRoute(METHOD_NAME_ALL, mergePath(path, "*"), handler);
     return this;
   }
-  addRoute(method, path, handler) {
+  #addRoute(method, path, handler) {
     method = method.toUpperCase();
     path = mergePath(this._basePath, path);
     const r = { path, method, handler };
     this.router.add(method, path, [handler, r]);
     this.routes.push(r);
   }
-  matchRoute(method, path) {
-    return this.router.match(method, path);
-  }
-  handleError(err, c) {
+  #handleError(err, c) {
     if (err instanceof Error) {
       return this.errorHandler(err, c);
     }
     throw err;
   }
-  dispatch(request, executionCtx, env, method) {
+  #dispatch(request, executionCtx, env, method) {
     if (method === "HEAD") {
-      return (async () => new Response(null, await this.dispatch(request, executionCtx, env, "GET")))();
+      return (async () => new Response(null, await this.#dispatch(request, executionCtx, env, "GET")))();
     }
     const path = this.getPath(request, { env });
-    const matchResult = this.matchRoute(method, path);
+    const matchResult = this.router.match(method, path);
     const c = new Context(request, {
       path,
       matchResult,
       env,
       executionCtx,
-      notFoundHandler: this.notFoundHandler
+      notFoundHandler: this.#notFoundHandler
     });
     if (matchResult[0].length === 1) {
       let res;
       try {
         res = matchResult[0][0][0][0](c, async () => {
-          c.res = await this.notFoundHandler(c);
+          c.res = await this.#notFoundHandler(c);
         });
       } catch (err) {
-        return this.handleError(err, c);
+        return this.#handleError(err, c);
       }
       return res instanceof Promise ? res.then(
-        (resolved) => resolved || (c.finalized ? c.res : this.notFoundHandler(c))
-      ).catch((err) => this.handleError(err, c)) : res ?? this.notFoundHandler(c);
+        (resolved) => resolved || (c.finalized ? c.res : this.#notFoundHandler(c))
+      ).catch((err) => this.#handleError(err, c)) : res ?? this.#notFoundHandler(c);
     }
-    const composed = compose(matchResult[0], this.errorHandler, this.notFoundHandler);
+    const composed = compose(matchResult[0], this.errorHandler, this.#notFoundHandler);
     return (async () => {
       try {
         const context = await composed(c);
@@ -3935,33 +3692,42 @@ var Hono = /* @__PURE__ */ __name(class {
         }
         return context.res;
       } catch (err) {
-        return this.handleError(err, c);
+        return this.#handleError(err, c);
       }
     })();
   }
   fetch = (request, ...rest) => {
-    return this.dispatch(request, rest[1], rest[0], request.method);
+    return this.#dispatch(request, rest[1], rest[0], request.method);
   };
   request = (input, requestInit, Env, executionCtx) => {
     if (input instanceof Request) {
-      if (requestInit !== void 0) {
-        input = new Request(input, requestInit);
-      }
-      return this.fetch(input, Env, executionCtx);
+      return this.fetch(requestInit ? new Request(input, requestInit) : input, Env, executionCtx);
     }
     input = input.toString();
-    const path = /^https?:\/\//.test(input) ? input : `http://localhost${mergePath("/", input)}`;
-    const req = new Request(path, requestInit);
-    return this.fetch(req, Env, executionCtx);
+    return this.fetch(
+      new Request(
+        /^https?:\/\//.test(input) ? input : `http://localhost${mergePath("/", input)}`,
+        requestInit
+      ),
+      Env,
+      executionCtx
+    );
   };
   fire = () => {
     addEventListener("fetch", (event) => {
-      event.respondWith(this.dispatch(event.request, event, void 0, event.request.method));
+      event.respondWith(this.#dispatch(event.request, event, void 0, event.request.method));
     });
   };
 }, "Hono");
 
-// node_modules/hono/dist/router/reg-exp-router/node.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/reg-exp-router/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/reg-exp-router/router.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/reg-exp-router/node.js
+init_define_DMNO_INJECTED_CONFIG();
 var LABEL_REG_EXP_STR = "[^/]+";
 var ONLY_WILDCARD_REG_EXP_STR = ".*";
 var TAIL_WILDCARD_REG_EXP_STR = "(?:|/.*)";
@@ -3988,18 +3754,18 @@ function compareKey(a, b) {
 }
 __name(compareKey, "compareKey");
 var Node = /* @__PURE__ */ __name(class {
-  index;
-  varIndex;
-  children = /* @__PURE__ */ Object.create(null);
+  #index;
+  #varIndex;
+  #children = /* @__PURE__ */ Object.create(null);
   insert(tokens, index, paramMap, context, pathErrorCheckOnly) {
     if (tokens.length === 0) {
-      if (this.index !== void 0) {
+      if (this.#index !== void 0) {
         throw PATH_ERROR;
       }
       if (pathErrorCheckOnly) {
         return;
       }
-      this.index = index;
+      this.#index = index;
       return;
     }
     const [token, ...restTokens] = tokens;
@@ -4014,9 +3780,9 @@ var Node = /* @__PURE__ */ __name(class {
           throw PATH_ERROR;
         }
       }
-      node = this.children[regexpStr];
+      node = this.#children[regexpStr];
       if (!node) {
-        if (Object.keys(this.children).some(
+        if (Object.keys(this.#children).some(
           (k) => k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
         )) {
           throw PATH_ERROR;
@@ -4024,18 +3790,18 @@ var Node = /* @__PURE__ */ __name(class {
         if (pathErrorCheckOnly) {
           return;
         }
-        node = this.children[regexpStr] = new Node();
+        node = this.#children[regexpStr] = new Node();
         if (name !== "") {
-          node.varIndex = context.varIndex++;
+          node.#varIndex = context.varIndex++;
         }
       }
       if (!pathErrorCheckOnly && name !== "") {
-        paramMap.push([name, node.varIndex]);
+        paramMap.push([name, node.#varIndex]);
       }
     } else {
-      node = this.children[token];
+      node = this.#children[token];
       if (!node) {
-        if (Object.keys(this.children).some(
+        if (Object.keys(this.#children).some(
           (k) => k.length > 1 && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
         )) {
           throw PATH_ERROR;
@@ -4043,19 +3809,19 @@ var Node = /* @__PURE__ */ __name(class {
         if (pathErrorCheckOnly) {
           return;
         }
-        node = this.children[token] = new Node();
+        node = this.#children[token] = new Node();
       }
     }
     node.insert(restTokens, index, paramMap, context, pathErrorCheckOnly);
   }
   buildRegExpStr() {
-    const childKeys = Object.keys(this.children).sort(compareKey);
+    const childKeys = Object.keys(this.#children).sort(compareKey);
     const strList = childKeys.map((k) => {
-      const c = this.children[k];
-      return (typeof c.varIndex === "number" ? `(${k})@${c.varIndex}` : regExpMetaChars.has(k) ? `\\${k}` : k) + c.buildRegExpStr();
+      const c = this.#children[k];
+      return (typeof c.#varIndex === "number" ? `(${k})@${c.#varIndex}` : regExpMetaChars.has(k) ? `\\${k}` : k) + c.buildRegExpStr();
     });
-    if (typeof this.index === "number") {
-      strList.unshift(`#${this.index}`);
+    if (typeof this.#index === "number") {
+      strList.unshift(`#${this.#index}`);
     }
     if (strList.length === 0) {
       return "";
@@ -4067,10 +3833,11 @@ var Node = /* @__PURE__ */ __name(class {
   }
 }, "Node");
 
-// node_modules/hono/dist/router/reg-exp-router/trie.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/reg-exp-router/trie.js
+init_define_DMNO_INJECTED_CONFIG();
 var Trie = /* @__PURE__ */ __name(class {
-  context = { varIndex: 0 };
-  root = new Node();
+  #context = { varIndex: 0 };
+  #root = new Node();
   insert(path, index, pathErrorCheckOnly) {
     const paramAssoc = [];
     const groups = [];
@@ -4097,11 +3864,11 @@ var Trie = /* @__PURE__ */ __name(class {
         }
       }
     }
-    this.root.insert(tokens, index, paramAssoc, this.context, pathErrorCheckOnly);
+    this.#root.insert(tokens, index, paramAssoc, this.#context, pathErrorCheckOnly);
     return paramAssoc;
   }
   buildRegExp() {
-    let regexp = this.root.buildRegExpStr();
+    let regexp = this.#root.buildRegExpStr();
     if (regexp === "") {
       return [/^$/, [], []];
     }
@@ -4109,11 +3876,11 @@ var Trie = /* @__PURE__ */ __name(class {
     const indexReplacementMap = [];
     const paramReplacementMap = [];
     regexp = regexp.replace(/#(\d+)|@(\d+)|\.\*\$/g, (_, handlerIndex, paramIndex) => {
-      if (typeof handlerIndex !== "undefined") {
+      if (handlerIndex !== void 0) {
         indexReplacementMap[++captureIndex] = Number(handlerIndex);
         return "$()";
       }
-      if (typeof paramIndex !== "undefined") {
+      if (paramIndex !== void 0) {
         paramReplacementMap[Number(paramIndex)] = ++captureIndex;
         return "";
       }
@@ -4123,7 +3890,7 @@ var Trie = /* @__PURE__ */ __name(class {
   }
 }, "Trie");
 
-// node_modules/hono/dist/router/reg-exp-router/router.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/reg-exp-router/router.js
 var emptyParam = [];
 var nullMatcher = [/^$/, [], /* @__PURE__ */ Object.create(null)];
 var wildcardRegExpCache = /* @__PURE__ */ Object.create(null);
@@ -4212,14 +3979,15 @@ function findMiddleware(middleware, path) {
 __name(findMiddleware, "findMiddleware");
 var RegExpRouter = /* @__PURE__ */ __name(class {
   name = "RegExpRouter";
-  middleware;
-  routes;
+  #middleware;
+  #routes;
   constructor() {
-    this.middleware = { [METHOD_NAME_ALL]: /* @__PURE__ */ Object.create(null) };
-    this.routes = { [METHOD_NAME_ALL]: /* @__PURE__ */ Object.create(null) };
+    this.#middleware = { [METHOD_NAME_ALL]: /* @__PURE__ */ Object.create(null) };
+    this.#routes = { [METHOD_NAME_ALL]: /* @__PURE__ */ Object.create(null) };
   }
   add(method, path, handler) {
-    const { middleware, routes } = this;
+    const middleware = this.#middleware;
+    const routes = this.#routes;
     if (!middleware || !routes) {
       throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
     }
@@ -4276,7 +4044,7 @@ var RegExpRouter = /* @__PURE__ */ __name(class {
   }
   match(method, path) {
     clearWildcardRegExpCache();
-    const matchers = this.buildAllMatchers();
+    const matchers = this.#buildAllMatchers();
     this.match = (method2, path2) => {
       const matcher = matchers[method2] || matchers[METHOD_NAME_ALL];
       const staticMatch = matcher[2][path2];
@@ -4292,18 +4060,18 @@ var RegExpRouter = /* @__PURE__ */ __name(class {
     };
     return this.match(method, path);
   }
-  buildAllMatchers() {
+  #buildAllMatchers() {
     const matchers = /* @__PURE__ */ Object.create(null);
-    [...Object.keys(this.routes), ...Object.keys(this.middleware)].forEach((method) => {
-      matchers[method] ||= this.buildMatcher(method);
+    Object.keys(this.#routes).concat(Object.keys(this.#middleware)).forEach((method) => {
+      matchers[method] ||= this.#buildMatcher(method);
     });
-    this.middleware = this.routes = void 0;
+    this.#middleware = this.#routes = void 0;
     return matchers;
   }
-  buildMatcher(method) {
+  #buildMatcher(method) {
     const routes = [];
     let hasOwnRoute = method === METHOD_NAME_ALL;
-    [this.middleware, this.routes].forEach((r) => {
+    [this.#middleware, this.#routes].forEach((r) => {
       const ownRoute = r[method] ? Object.keys(r[method]).map((path) => [path, r[method][path]]) : [];
       if (ownRoute.length !== 0) {
         hasOwnRoute ||= true;
@@ -4322,25 +4090,30 @@ var RegExpRouter = /* @__PURE__ */ __name(class {
   }
 }, "RegExpRouter");
 
-// node_modules/hono/dist/router/smart-router/router.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/smart-router/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/smart-router/router.js
+init_define_DMNO_INJECTED_CONFIG();
 var SmartRouter = /* @__PURE__ */ __name(class {
   name = "SmartRouter";
-  routers = [];
-  routes = [];
-  constructor(init) {
-    Object.assign(this, init);
+  #routers = [];
+  #routes = [];
+  constructor(init2) {
+    this.#routers = init2.routers;
   }
   add(method, path, handler) {
-    if (!this.routes) {
+    if (!this.#routes) {
       throw new Error(MESSAGE_MATCHER_IS_ALREADY_BUILT);
     }
-    this.routes.push([method, path, handler]);
+    this.#routes.push([method, path, handler]);
   }
   match(method, path) {
-    if (!this.routes) {
+    if (!this.#routes) {
       throw new Error("Fatal error");
     }
-    const { routers, routes } = this;
+    const routers = this.#routers;
+    const routes = this.#routes;
     const len = routers.length;
     let i = 0;
     let res;
@@ -4358,8 +4131,8 @@ var SmartRouter = /* @__PURE__ */ __name(class {
         throw e;
       }
       this.match = router.match.bind(router);
-      this.routers = [router];
-      this.routes = void 0;
+      this.#routers = [router];
+      this.#routes = void 0;
       break;
     }
     if (i === len) {
@@ -4369,72 +4142,76 @@ var SmartRouter = /* @__PURE__ */ __name(class {
     return res;
   }
   get activeRouter() {
-    if (this.routes || this.routers.length !== 1) {
+    if (this.#routes || this.#routers.length !== 1) {
       throw new Error("No active router has been determined yet.");
     }
-    return this.routers[0];
+    return this.#routers[0];
   }
 }, "SmartRouter");
 
-// node_modules/hono/dist/router/trie-router/node.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/trie-router/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/trie-router/router.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/trie-router/node.js
+init_define_DMNO_INJECTED_CONFIG();
 var Node2 = /* @__PURE__ */ __name(class {
-  methods;
-  children;
-  patterns;
-  order = 0;
-  params = /* @__PURE__ */ Object.create(null);
+  #methods;
+  #children;
+  #patterns;
+  #order = 0;
+  #params = /* @__PURE__ */ Object.create(null);
   constructor(method, handler, children) {
-    this.children = children || /* @__PURE__ */ Object.create(null);
-    this.methods = [];
+    this.#children = children || /* @__PURE__ */ Object.create(null);
+    this.#methods = [];
     if (method && handler) {
       const m = /* @__PURE__ */ Object.create(null);
       m[method] = { handler, possibleKeys: [], score: 0 };
-      this.methods = [m];
+      this.#methods = [m];
     }
-    this.patterns = [];
+    this.#patterns = [];
   }
   insert(method, path, handler) {
-    this.order = ++this.order;
+    this.#order = ++this.#order;
     let curNode = this;
     const parts = splitRoutingPath(path);
     const possibleKeys = [];
     for (let i = 0, len = parts.length; i < len; i++) {
       const p = parts[i];
-      if (Object.keys(curNode.children).includes(p)) {
-        curNode = curNode.children[p];
+      if (Object.keys(curNode.#children).includes(p)) {
+        curNode = curNode.#children[p];
         const pattern2 = getPattern(p);
         if (pattern2) {
           possibleKeys.push(pattern2[1]);
         }
         continue;
       }
-      curNode.children[p] = new Node2();
+      curNode.#children[p] = new Node2();
       const pattern = getPattern(p);
       if (pattern) {
-        curNode.patterns.push(pattern);
+        curNode.#patterns.push(pattern);
         possibleKeys.push(pattern[1]);
       }
-      curNode = curNode.children[p];
-    }
-    if (!curNode.methods.length) {
-      curNode.methods = [];
+      curNode = curNode.#children[p];
     }
     const m = /* @__PURE__ */ Object.create(null);
     const handlerSet = {
       handler,
       possibleKeys: possibleKeys.filter((v, i, a) => a.indexOf(v) === i),
-      score: this.order
+      score: this.#order
     };
     m[method] = handlerSet;
-    curNode.methods.push(m);
+    curNode.#methods.push(m);
     return curNode;
   }
-  gHSets(node, method, nodeParams, params) {
+  #getHandlerSets(node, method, nodeParams, params) {
     const handlerSets = [];
-    for (let i = 0, len = node.methods.length; i < len; i++) {
-      const m = node.methods[i];
+    for (let i = 0, len = node.#methods.length; i < len; i++) {
+      const m = node.#methods[i];
       const handlerSet = m[method] || m[METHOD_NAME_ALL];
-      const processedSet = /* @__PURE__ */ Object.create(null);
+      const processedSet = {};
       if (handlerSet !== void 0) {
         handlerSet.params = /* @__PURE__ */ Object.create(null);
         for (let i2 = 0, len2 = handlerSet.possibleKeys.length; i2 < len2; i2++) {
@@ -4450,7 +4227,7 @@ var Node2 = /* @__PURE__ */ __name(class {
   }
   search(method, path) {
     const handlerSets = [];
-    this.params = /* @__PURE__ */ Object.create(null);
+    this.#params = /* @__PURE__ */ Object.create(null);
     const curNode = this;
     let curNodes = [curNode];
     const parts = splitPath(path);
@@ -4460,27 +4237,36 @@ var Node2 = /* @__PURE__ */ __name(class {
       const tempNodes = [];
       for (let j = 0, len2 = curNodes.length; j < len2; j++) {
         const node = curNodes[j];
-        const nextNode = node.children[part];
+        const nextNode = node.#children[part];
         if (nextNode) {
-          nextNode.params = node.params;
+          nextNode.#params = node.#params;
           if (isLast) {
-            if (nextNode.children["*"]) {
+            if (nextNode.#children["*"]) {
               handlerSets.push(
-                ...this.gHSets(nextNode.children["*"], method, node.params, /* @__PURE__ */ Object.create(null))
+                ...this.#getHandlerSets(
+                  nextNode.#children["*"],
+                  method,
+                  node.#params,
+                  /* @__PURE__ */ Object.create(null)
+                )
               );
             }
-            handlerSets.push(...this.gHSets(nextNode, method, node.params, /* @__PURE__ */ Object.create(null)));
+            handlerSets.push(
+              ...this.#getHandlerSets(nextNode, method, node.#params, /* @__PURE__ */ Object.create(null))
+            );
           } else {
             tempNodes.push(nextNode);
           }
         }
-        for (let k = 0, len3 = node.patterns.length; k < len3; k++) {
-          const pattern = node.patterns[k];
-          const params = { ...node.params };
+        for (let k = 0, len3 = node.#patterns.length; k < len3; k++) {
+          const pattern = node.#patterns[k];
+          const params = { ...node.#params };
           if (pattern === "*") {
-            const astNode = node.children["*"];
+            const astNode = node.#children["*"];
             if (astNode) {
-              handlerSets.push(...this.gHSets(astNode, method, node.params, /* @__PURE__ */ Object.create(null)));
+              handlerSets.push(
+                ...this.#getHandlerSets(astNode, method, node.#params, /* @__PURE__ */ Object.create(null))
+              );
               tempNodes.push(astNode);
             }
             continue;
@@ -4489,61 +4275,63 @@ var Node2 = /* @__PURE__ */ __name(class {
             continue;
           }
           const [key, name, matcher] = pattern;
-          const child = node.children[key];
+          const child = node.#children[key];
           const restPathString = parts.slice(i).join("/");
           if (matcher instanceof RegExp && matcher.test(restPathString)) {
             params[name] = restPathString;
-            handlerSets.push(...this.gHSets(child, method, node.params, params));
+            handlerSets.push(...this.#getHandlerSets(child, method, node.#params, params));
             continue;
           }
           if (matcher === true || matcher.test(part)) {
-            if (typeof key === "string") {
-              params[name] = part;
-              if (isLast) {
-                handlerSets.push(...this.gHSets(child, method, params, node.params));
-                if (child.children["*"]) {
-                  handlerSets.push(...this.gHSets(child.children["*"], method, params, node.params));
-                }
-              } else {
-                child.params = params;
-                tempNodes.push(child);
+            params[name] = part;
+            if (isLast) {
+              handlerSets.push(...this.#getHandlerSets(child, method, params, node.#params));
+              if (child.#children["*"]) {
+                handlerSets.push(
+                  ...this.#getHandlerSets(child.#children["*"], method, params, node.#params)
+                );
               }
+            } else {
+              child.#params = params;
+              tempNodes.push(child);
             }
           }
         }
       }
       curNodes = tempNodes;
     }
-    const results = handlerSets.sort((a, b) => {
-      return a.score - b.score;
-    });
-    return [results.map(({ handler, params }) => [handler, params])];
+    if (handlerSets.length > 1) {
+      handlerSets.sort((a, b) => {
+        return a.score - b.score;
+      });
+    }
+    return [handlerSets.map(({ handler, params }) => [handler, params])];
   }
 }, "Node");
 
-// node_modules/hono/dist/router/trie-router/router.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/router/trie-router/router.js
 var TrieRouter = /* @__PURE__ */ __name(class {
   name = "TrieRouter";
-  node;
+  #node;
   constructor() {
-    this.node = new Node2();
+    this.#node = new Node2();
   }
   add(method, path, handler) {
     const results = checkOptionalParameter(path);
     if (results) {
       for (let i = 0, len = results.length; i < len; i++) {
-        this.node.insert(method, results[i], handler);
+        this.#node.insert(method, results[i], handler);
       }
       return;
     }
-    this.node.insert(method, path, handler);
+    this.#node.insert(method, path, handler);
   }
   match(method, path) {
-    return this.node.search(method, path);
+    return this.#node.search(method, path);
   }
 }, "TrieRouter");
 
-// node_modules/hono/dist/hono.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/hono.js
 var Hono2 = /* @__PURE__ */ __name(class extends Hono {
   constructor(options = {}) {
     super(options);
@@ -4553,7 +4341,11 @@ var Hono2 = /* @__PURE__ */ __name(class extends Hono {
   }
 }, "Hono");
 
-// node_modules/hono/dist/middleware/request-id/request-id.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/request-id/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/request-id/request-id.js
+init_define_DMNO_INJECTED_CONFIG();
 var requestId = /* @__PURE__ */ __name(({
   limitLength = 255,
   headerName = "X-Request-Id",
@@ -4572,7 +4364,11 @@ var requestId = /* @__PURE__ */ __name(({
   }, "requestId2");
 }, "requestId");
 
-// node_modules/hono/dist/http-exception.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/bearer-auth/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/http-exception.js
+init_define_DMNO_INJECTED_CONFIG();
 var HTTPException = /* @__PURE__ */ __name(class extends Error {
   res;
   status;
@@ -4595,7 +4391,11 @@ var HTTPException = /* @__PURE__ */ __name(class extends Error {
   }
 }, "HTTPException");
 
-// node_modules/hono/dist/utils/crypto.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/buffer.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/crypto.js
+init_define_DMNO_INJECTED_CONFIG();
 var sha256 = /* @__PURE__ */ __name(async (data) => {
   const algorithm = { name: "SHA-256", alias: "sha256" };
   const hash = await createHash(data, algorithm);
@@ -4603,15 +4403,6 @@ var sha256 = /* @__PURE__ */ __name(async (data) => {
 }, "sha256");
 var createHash = /* @__PURE__ */ __name(async (data, algorithm) => {
   let sourceBuffer;
-  if (data instanceof ReadableStream) {
-    let body = "";
-    const reader = data.getReader();
-    await reader?.read().then(async (chuck) => {
-      const value = await createHash(chuck.value || "", algorithm);
-      body += value;
-    });
-    return body;
-  }
   if (ArrayBuffer.isView(data) || data instanceof ArrayBuffer) {
     sourceBuffer = data;
   } else {
@@ -4633,7 +4424,7 @@ var createHash = /* @__PURE__ */ __name(async (data, algorithm) => {
   return null;
 }, "createHash");
 
-// node_modules/hono/dist/utils/buffer.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/buffer.js
 var timingSafeEqual = /* @__PURE__ */ __name(async (a, b, hashFunction) => {
   if (!hashFunction) {
     hashFunction = sha256;
@@ -4645,7 +4436,7 @@ var timingSafeEqual = /* @__PURE__ */ __name(async (a, b, hashFunction) => {
   return sa === sb && a === b;
 }, "timingSafeEqual");
 
-// node_modules/hono/dist/middleware/bearer-auth/index.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/bearer-auth/index.js
 var TOKEN_STRINGS = "[A-Za-z0-9._~+/-]+=*";
 var PREFIX = "Bearer";
 var HEADER = "Authorization";
@@ -4723,7 +4514,8 @@ var bearerAuth = /* @__PURE__ */ __name((options) => {
   }, "bearerAuth2");
 }, "bearerAuth");
 
-// node_modules/hono/dist/middleware/pretty-json/index.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/pretty-json/index.js
+init_define_DMNO_INJECTED_CONFIG();
 var prettyJSON = /* @__PURE__ */ __name((options) => {
   const targetQuery = options?.query ?? "pretty";
   return /* @__PURE__ */ __name(async function prettyJSON2(c, next) {
@@ -4736,7 +4528,8 @@ var prettyJSON = /* @__PURE__ */ __name((options) => {
   }, "prettyJSON2");
 }, "prettyJSON");
 
-// node_modules/hono/dist/middleware/combine/index.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/combine/index.js
+init_define_DMNO_INJECTED_CONFIG();
 var some = /* @__PURE__ */ __name((...middleware) => {
   return /* @__PURE__ */ __name(async function some2(c, next) {
     let lastError;
@@ -4762,16 +4555,22 @@ var some = /* @__PURE__ */ __name((...middleware) => {
   }, "some2");
 }, "some");
 var every = /* @__PURE__ */ __name((...middleware) => {
-  const wrappedMiddleware = middleware.map((m) => async (c, next) => {
-    const res = await m(c, next);
-    if (res === false) {
-      throw new Error("Unmet condition");
-    }
-    return res;
-  });
-  const handler = /* @__PURE__ */ __name(async (c, next) => compose(wrappedMiddleware.map((m) => [[m, void 0], c.req.param()]))(c, next), "handler");
   return /* @__PURE__ */ __name(async function every2(c, next) {
-    await handler(c, next);
+    const currentRouteIndex = c.req.routeIndex;
+    await compose(
+      middleware.map((m) => [
+        [
+          async (c2, next2) => {
+            c2.req.routeIndex = currentRouteIndex;
+            const res = await m(c2, next2);
+            if (res === false) {
+              throw new Error("Unmet condition");
+            }
+            return res;
+          }
+        ]
+      ])
+    )(c, next);
   }, "every2");
 }, "every");
 var except = /* @__PURE__ */ __name((condition, ...middleware) => {
@@ -4793,12 +4592,19 @@ var except = /* @__PURE__ */ __name((condition, ...middleware) => {
   }, "except2");
 }, "except");
 
-// node_modules/hono/dist/helper/html/index.js
+// node_modules/.pnpm/@scalar+hono-api-reference@0.5.163_hono@4.6.13/node_modules/@scalar/hono-api-reference/dist/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/@scalar+hono-api-reference@0.5.163_hono@4.6.13/node_modules/@scalar/hono-api-reference/dist/honoApiReference.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/helper/html/index.js
+init_define_DMNO_INJECTED_CONFIG();
 var html = /* @__PURE__ */ __name((strings, ...values) => {
   const buffer = [""];
   for (let i = 0, len = strings.length - 1; i < len; i++) {
     buffer[0] += strings[i];
-    const children = values[i] instanceof Array ? values[i].flat(Infinity) : [values[i]];
+    const children = Array.isArray(values[i]) ? values[i].flat(Infinity) : [values[i]];
     for (let i2 = 0, len2 = children.length; i2 < len2; i2++) {
       const child = children[i2];
       if (typeof child === "string") {
@@ -4826,11 +4632,11 @@ var html = /* @__PURE__ */ __name((strings, ...values) => {
       }
     }
   }
-  buffer[0] += strings[strings.length - 1];
+  buffer[0] += strings.at(-1);
   return buffer.length === 1 ? "callbacks" in buffer ? raw(resolveCallbackSync(raw(buffer[0], buffer.callbacks))) : raw(buffer[0]) : stringBufferToString(buffer, buffer.callbacks);
 }, "html");
 
-// node_modules/@scalar/hono-api-reference/dist/honoApiReference.js
+// node_modules/.pnpm/@scalar+hono-api-reference@0.5.163_hono@4.6.13/node_modules/@scalar/hono-api-reference/dist/honoApiReference.js
 var customThemeCSS = `
 .light-mode {
   color-scheme: light;
@@ -4966,7 +4772,16 @@ var apiReference = /* @__PURE__ */ __name((options) => async (c) => {
   );
 }, "apiReference");
 
-// node_modules/hono/dist/middleware/secure-headers/secure-headers.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/secure-headers/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/secure-headers/secure-headers.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/utils/encode.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/secure-headers/secure-headers.js
 var HEADERS_MAP = {
   crossOriginEmbedderPolicy: ["Cross-Origin-Embedder-Policy", "require-corp"],
   crossOriginResourcePolicy: ["Cross-Origin-Resource-Policy", "same-origin"],
@@ -5121,11 +4936,12 @@ function setHeaders2(ctx, headersToSet) {
 }
 __name(setHeaders2, "setHeaders");
 
-// node_modules/hono/dist/middleware/trailing-slash/index.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/middleware/trailing-slash/index.js
+init_define_DMNO_INJECTED_CONFIG();
 var trimTrailingSlash = /* @__PURE__ */ __name(() => {
   return /* @__PURE__ */ __name(async function trimTrailingSlash2(c, next) {
     await next();
-    if (c.res.status === 404 && c.req.method === "GET" && c.req.path !== "/" && c.req.path[c.req.path.length - 1] === "/") {
+    if (c.res.status === 404 && c.req.method === "GET" && c.req.path !== "/" && c.req.path.at(-1) === "/") {
       const url = new URL(c.req.url);
       url.pathname = url.pathname.substring(0, url.pathname.length - 1);
       c.res = c.redirect(url.toString(), 301);
@@ -5133,12 +4949,796 @@ var trimTrailingSlash = /* @__PURE__ */ __name(() => {
   }, "trimTrailingSlash2");
 }, "trimTrailingSlash");
 
-// config.js
-var import_api = __toESM(require_api());
-var import_wrangler = __toESM(require_wrangler());
+// src/config.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// src/api.js
+init_define_DMNO_INJECTED_CONFIG();
+var year = (/* @__PURE__ */ new Date()).getFullYear();
+var API = {
+  "openapi": "3.1.0",
+  "servers": [{
+    "url": "http://localhost:1337",
+    "description": "localhost"
+  }],
+  "info": {
+    "title": `vlt serverless registry`,
+    "version": "0.1.1",
+    "license": {
+      "identifier": "FSL-1.1-MIT",
+      "name": "Functional Source License, Version 1.1, MIT Future License",
+      "url": "https://fsl.software/FSL-1.1-MIT.template.md"
+    },
+    "description": `
+  The **vlt serverless registry** is a npm compatible JavaScript package registry which replicates core features & functionality of **\`registry.npmjs.org\`** while also introducing net-new capabilities.
+
+  ### Compatible Clients
+
+  <table>
+    <tbody>
+      <tr>
+        <td><a href="https://vlt.sh" alt="vlt"><strong><code>vlt</code></strong></a></td>
+        <td><a href="https://npmjs.com/package/npm" alt="npm"><strong><code>npm</code></strong></a></td>
+        <td><a href="https://yarnpkg.com/" alt="yarn"><strong><code>yarn</code></strong></a></td>
+        <td><a href="https://pnpm.io/" alt="pnpm"><strong><code>pnpm</code></strong></a></td>
+        <td><a href="https://deno.com/" alt="deno"><strong><code>deno</code></strong></a></td>
+        <td><a href="https://bun.sh/" alt="bun"><strong><code>bun</code></strong></a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  ### Resources
+
+  <ul alt="resources">
+    <li><a href="https://vlt.sh">https://<strong>vlt.sh</strong></a></li>
+    <li><a href="https://github.com/vltpkg/vsr">https://github.com/<strong>vltpkg/vsr</strong></a></li>
+    <li><a href="https://discord.gg/vltpkg">https://discord.gg/<strong>vltpkg</strong></a></li>
+    <li><a href="https://x.com/vltpkg">https://x.com/<strong>vltpkg</strong></a></li>
+  </ul>
+
+  ##### Trademark Disclaimer
+
+  <p alt="trademark-disclaimer">All trademarks, logos and brand names are the property of their respective owners. All company, product and service names used in this website are for identification purposes only. Use of these names, trademarks and brands does not imply endorsement.</p>
+
+  ### License
+
+<details alt="license">
+  <summary><strong>Functional Source License</strong>, Version 1.1, MIT Future License</summary>
+<h1>Functional Source License,<br />Version 1.1,<br />MIT Future License</h1>
+<h2>Abbreviation</h2>
+
+FSL-1.1-MIT
+
+<h2>Notice</h2>
+
+Copyright ${year} vlt technology inc.
+
+<h2>Terms and Conditions</h2>
+
+<h3>Licensor ("We")</h3>
+
+The party offering the Software under these Terms and Conditions.
+
+<h3>The Software</h3>
+
+The "Software" is each version of the software that we make available under
+these Terms and Conditions, as indicated by our inclusion of these Terms and
+Conditions with the Software.
+
+<h3>License Grant</h3>
+
+Subject to your compliance with this License Grant and the Patents,
+Redistribution and Trademark clauses below, we hereby grant you the right to
+use, copy, modify, create derivative works, publicly perform, publicly display
+and redistribute the Software for any Permitted Purpose identified below.
+
+<h3>Permitted Purpose</h3>
+
+A Permitted Purpose is any purpose other than a Competing Use. A Competing Use
+means making the Software available to others in a commercial product or
+service that:
+
+1. substitutes for the Software;
+
+2. substitutes for any other product or service we offer using the Software
+  that exists as of the date we make the Software available; or
+
+3. offers the same or substantially similar functionality as the Software.
+
+Permitted Purposes specifically include using the Software:
+
+1. for your internal use and access;
+
+2. for non-commercial education;
+
+3. for non-commercial research; and
+
+4. in connection with professional services that you provide to a licensee
+  using the Software in accordance with these Terms and Conditions.
+
+<h3>Patents</h3>
+
+To the extent your use for a Permitted Purpose would necessarily infringe our
+patents, the license grant above includes a license under our patents. If you
+make a claim against any party that the Software infringes or contributes to
+the infringement of any patent, then your patent license to the Software ends
+immediately.
+
+<h3>Redistribution</h3>
+
+The Terms and Conditions apply to all copies, modifications and derivatives of
+the Software.
+
+If you redistribute any copies, modifications or derivatives of the Software,
+you must include a copy of or a link to these Terms and Conditions and not
+remove any copyright notices provided in or with the Software.
+
+<h3>Disclaimer</h3>
+
+THE SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF FITNESS FOR A PARTICULAR
+PURPOSE, MERCHANTABILITY, TITLE OR NON-INFRINGEMENT.
+
+IN NO EVENT WILL WE HAVE ANY LIABILITY TO YOU ARISING OUT OF OR RELATED TO THE
+SOFTWARE, INCLUDING INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES,
+EVEN IF WE HAVE BEEN INFORMED OF THEIR POSSIBILITY IN ADVANCE.
+
+<h3>Trademarks</h3>
+
+Except for displaying the License Details and identifying us as the origin of
+the Software, you have no right under these Terms and Conditions to use our
+trademarks, trade names, service marks or product names.
+
+<h2>Grant of Future License</h2>
+
+We hereby irrevocably grant you an additional license to use the Software under
+the MIT license that is effective on the second anniversary of the date we make
+the Software available. On or after that date, you may use the Software under
+the MIT license, in which case the following will apply:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</dialog>
+  `
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Bearer <token>"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Some endpoints are public, but some require authentication. We provide all the required endpoints to create an account and authorize yourself."
+    },
+    {
+      "name": "Tokens",
+      "description": ""
+    },
+    {
+      "name": "Packages",
+      "description": ""
+    },
+    {
+      "name": "Misc.",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/-/npm/v1/user": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get User Profile",
+        "description": `Returns profile object associated with auth token
+\`\`\`bash
+$ npm profile
+name: johnsmith
+created: 2015-02-26T01:26:01.124Z
+updated: 2023-01-10T21:55:32.118Z
+\`\`\``,
+        "responses": {
+          "200": {
+            "description": "User Profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "name": "johnsmith"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/-/ping": {
+      "get": {
+        "tags": ["Misc."],
+        "summary": "Ping",
+        "description": `Check if the server is alive
+\`\`\`bash
+$ npm ping
+npm notice PING http://localhost:1337/
+npm notice PONG 13ms
+\`\`\``,
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Server is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": ["Misc."],
+        "summary": "Documentation",
+        "description": "Get the registry docs",
+        "responses": {
+          "200": {
+            "description": "Retrieves the registry docs"
+          }
+        }
+      }
+    },
+    "/-/whoami": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get User Username",
+        "description": `Returns username associated with auth token
+\`\`\`bash
+$ npm whoami
+johnsmith
+\`\`\``,
+        "responses": {
+          "200": {
+            "description": "Retrieves a user name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "username": "johnsmith"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/-/npm/v1/tokens": {
+      "get": {
+        "tags": ["Tokens"],
+        "summary": "Get Token Profile",
+        "description": `Get tokens for the associative authenticated user
+
+\`\`\`bash
+$ npm token list
+<token-type> token <partial-token>\u2026 with id <uuid> created <date-created>
+\`\`\``,
+        "responses": {
+          "200": {
+            "description": "Token Profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "objects": [
+                      {
+                        "cidr_whitelist": null,
+                        "readonly": false,
+                        "automation": null,
+                        "created": null,
+                        "updated": null,
+                        "scope": [
+                          {
+                            "values": [
+                              "*"
+                            ],
+                            "types": {
+                              "pkg": {
+                                "read": true,
+                                "write": true
+                              }
+                            }
+                          },
+                          {
+                            "values": [
+                              "*"
+                            ],
+                            "types": {
+                              "user": {
+                                "read": true,
+                                "write": true
+                              }
+                            }
+                          }
+                        ],
+                        "key": "fff00131-d831-4517-84c0-1b53b1c85ba9",
+                        "token": "a67a46ad-fe51-4fde-94fe-c56ee00fd638"
+                      }
+                    ],
+                    "urls": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tokens"],
+        "summary": "Create Token",
+        "description": "Creates a token for authenticated user or provided UUID user (later requires global read+write user scope)",
+        "headers": {
+          "Authorization": {
+            "description": "The number of allowed requests in the current period",
+            "schema": {
+              "type": "Authorization",
+              "bearerFormat": "Bearer <token>"
+            }
+          }
+        },
+        "requestBody": {
+          "description": "Scope of access/scopes for the new token",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "uuid": "admin",
+                  "scope": [
+                    {
+                      "values": ["*"],
+                      "types": { "pkg": { "read": true, "write": false } }
+                    },
+                    {
+                      "values": [
+                        "~admin"
+                      ],
+                      "types": {
+                        "user": {
+                          "read": true,
+                          "write": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Token created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "uuid": "admin",
+                    "token": "1ef5f713-15ff-6491-b62d-d16f6f04e6ac",
+                    "scope": [
+                      {
+                        "values": [
+                          "*"
+                        ],
+                        "types": {
+                          "pkg": {
+                            "read": true,
+                            "write": false
+                          }
+                        }
+                      },
+                      {
+                        "values": [
+                          "~admin"
+                        ],
+                        "types": {
+                          "user": {
+                            "read": true,
+                            "write": true
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tokens"],
+        "summary": "Update Token",
+        "description": "Update a token by the token itself",
+        "responses": {
+          "200": {
+            "description": "Token updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tokens"],
+        "summary": "Delete Token by Auth",
+        "description": `Revokes a token for the associative authenticated user
+
+\`\`\`bash
+$ npm token revoke <token>
+\`\`\``,
+        "responses": {
+          "204": {
+            "description": "Token Deleted Response"
+          }
+        }
+      }
+    },
+    "/-/npm/v1/tokens/token/{uuid}": {
+      "delete": {
+        "tags": ["Tokens"],
+        "summary": "Delete Token by UUID",
+        "description": "Delete a token by the token UUID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uuid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Token deleted"
+          }
+        }
+      }
+    },
+    "/{package-name}": {
+      "get": {
+        "tags": ["Packages"],
+        "summary": "Get Package Packument",
+        "description": "Returns all published packages & metadata for the specific package name",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package packument"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Packages"],
+        "summary": "Publish Package",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Package data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Package published"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/{package-name}/{version}": {
+      "get": {
+        "tags": ["Packages"],
+        "summary": "Get Package Manifest",
+        "description": "Returns the full package manifest for a specific package version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package manifest"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/{package-name}/-/{tarball}": {
+      "get": {
+        "tags": ["Packages"],
+        "summary": "Get Package Tarball",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scope",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "package-name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "tarball",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package tarball"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+    },
+    "basicAuth": {
+      "type": "http",
+      "scheme": "basic"
+    },
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-API-Key"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "api_key"
+    },
+    "apiKeyCookie": {
+      "type": "apiKey",
+      "in": "cookie",
+      "name": "api_key"
+    },
+    "oAuth2": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "clientCredentials": {
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "implicit": {
+          "authorizationUrl": "https://galaxy.scalar.com/oauth/authorize",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        },
+        "password": {
+          "tokenUrl": "https://galaxy.scalar.com/oauth/token",
+          "scopes": {
+            "read:account": "read your account information",
+            "write:planets": "modify planets in your account",
+            "read:planets": "read your planets"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "planetId": {
+      "name": "planetId",
+      "in": "path",
+      "required": true,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "examples": [
+          1
+        ]
+      }
+    },
+    "limit": {
+      "name": "limit",
+      "in": "query",
+      "description": "The number of items to return",
+      "required": false,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "default": 10
+      }
+    },
+    "offset": {
+      "name": "offset",
+      "in": "query",
+      "description": "The number of items to skip before starting to collect the result set",
+      "required": false,
+      "schema": {
+        "type": "integer",
+        "format": "int64",
+        "default": 0
+      }
+    }
+  },
+  "responses": {
+    "BadRequest": {
+      "description": "Bad Request",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "Forbidden": {
+      "description": "Forbidden",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "NotFound": {
+      "description": "NotFound",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    },
+    "Unauthorized": {
+      "description": "Unauthorized",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      }
+    }
+  }
+};
+
+// src/config.js
 var PROXIES = [];
 var ANY_PACKAGE_SPEC = "*";
-var DOMAIN = `http://localhost:${import_wrangler.dev.port}`;
 var REQUEST_TIMEOUT = 60 * 1e3;
 var API_DOCS = {
   metaData: {
@@ -5185,15 +5785,26 @@ var API_DOCS = {
     javascript: ["xhr", "jquery"]
   },
   spec: {
-    content: import_api.API
+    content: API
   },
-  customCss: `@import '${DOMAIN}/styles/styles.css';`
+  customCss: `@import '${"http://localhost:1337"}/styles/styles.css';`
 };
 
+// src/utils/auth.js
+init_define_DMNO_INJECTED_CONFIG();
+
 // src/utils/packages.js
+init_define_DMNO_INJECTED_CONFIG();
 import { Buffer as Buffer2 } from "node:buffer";
 
-// node_modules/streaming-tarball/dist/TarChunker.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/extract.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarChunker.js
+init_define_DMNO_INJECTED_CONFIG();
 var TarChunker = class {
   constructor() {
     this.buffer = new Uint8Array(512);
@@ -5221,7 +5832,11 @@ var TarChunker = class {
 };
 __name(TarChunker, "TarChunker");
 
-// node_modules/streaming-tarball/dist/TarObject.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarExtender.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarObject.js
+init_define_DMNO_INJECTED_CONFIG();
 var TAR_OBJECT_TYPE_FILE = "0";
 var TAR_OBJECT_TYPE_PAX_GLOBAL = "g";
 var TAR_OBJECT_TYPE_PAX_NEXT = "x";
@@ -5253,7 +5868,8 @@ var TarObject = class {
 };
 __name(TarObject, "TarObject");
 
-// node_modules/streaming-tarball/dist/TarPaxParser.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarPaxParser.js
+init_define_DMNO_INJECTED_CONFIG();
 var TAR_PAX_KEY_NAME = "path";
 var TAR_PAX_KEY_LINK_NAME = "linkpath";
 var TarPaxParserState;
@@ -5333,7 +5949,7 @@ var TarPaxParser = class {
 };
 __name(TarPaxParser, "TarPaxParser");
 
-// node_modules/streaming-tarball/dist/TarExtender.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarExtender.js
 var TarExtender = class {
   constructor() {
     this.globalOverrides = /* @__PURE__ */ new Map();
@@ -5437,7 +6053,8 @@ var TarExtender = class {
 };
 __name(TarExtender, "TarExtender");
 
-// node_modules/streaming-tarball/dist/TarParser.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/TarParser.js
+init_define_DMNO_INJECTED_CONFIG();
 function parseOctal(chunk) {
   let str = "";
   for (let i = 0; i < chunk.length; i++) {
@@ -5538,7 +6155,7 @@ var TarParser = class {
 };
 __name(TarParser, "TarParser");
 
-// node_modules/streaming-tarball/dist/extract.js
+// node_modules/.pnpm/streaming-tarball@1.0.3/node_modules/streaming-tarball/dist/extract.js
 function extract(stream) {
   const chunker = new TarChunker();
   const parser = new TarParser();
@@ -5547,7 +6164,8 @@ function extract(stream) {
 }
 __name(extract, "extract");
 
-// node_modules/get-npm-tarball-url/lib/index.mjs
+// node_modules/.pnpm/get-npm-tarball-url@2.1.0/node_modules/get-npm-tarball-url/lib/index.mjs
+init_define_DMNO_INJECTED_CONFIG();
 function src_default(pkgName, pkgVersion, opts) {
   let registry;
   if (opts == null ? void 0 : opts.registry) {
@@ -5575,7 +6193,7 @@ function getScopelessName(name) {
 __name(getScopelessName, "getScopelessName");
 
 // src/utils/packages.js
-var import_semver = __toESM(require_semver2());
+var import_semver = __toESM(require_semver2(), 1);
 async function extractPackageJSON(buffer) {
   const blob = new Blob([Buffer2.from(buffer)]);
   const stream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
@@ -5637,7 +6255,7 @@ function createVersion({ pkg, version, manifest }) {
     name: pkg,
     version,
     dist: {
-      tarball: `${DOMAIN}/${file}`
+      tarball: `${"http://localhost:1337"}/${file}`
     }
   };
   return { ...manifest, ...temp };
@@ -5760,6 +6378,7 @@ async function verifyToken(token, c) {
 __name(verifyToken, "verifyToken");
 
 // src/routes/users.js
+init_define_DMNO_INJECTED_CONFIG();
 async function getUsername(c) {
   const { uuid } = await getAuthedUser({ c });
   return c.json({ username: uuid }, 200);
@@ -5771,7 +6390,14 @@ async function getUserProfile(c) {
 }
 __name(getUserProfile, "getUserProfile");
 
-// node_modules/uuid/dist/esm-browser/stringify.js
+// src/routes/tokens.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/stringify.js
+init_define_DMNO_INJECTED_CONFIG();
 var byteToHex = [];
 for (i = 0; i < 256; ++i) {
   byteToHex.push((i + 256).toString(16).slice(1));
@@ -5782,7 +6408,8 @@ function unsafeStringify(arr, offset = 0) {
 }
 __name(unsafeStringify, "unsafeStringify");
 
-// node_modules/uuid/dist/esm-browser/rng.js
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/rng.js
+init_define_DMNO_INJECTED_CONFIG();
 var getRandomValues;
 var rnds8 = new Uint8Array(16);
 function rng() {
@@ -5796,13 +6423,17 @@ function rng() {
 }
 __name(rng, "rng");
 
-// node_modules/uuid/dist/esm-browser/native.js
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/v4.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/native.js
+init_define_DMNO_INJECTED_CONFIG();
 var randomUUID = typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID.bind(crypto);
 var native_default = {
   randomUUID
 };
 
-// node_modules/uuid/dist/esm-browser/v4.js
+// node_modules/.pnpm/uuid@10.0.0/node_modules/uuid/dist/esm-browser/v4.js
 function v4(options, buf, offset) {
   if (native_default.randomUUID && !buf && !options) {
     return native_default.randomUUID();
@@ -5917,11 +6548,16 @@ async function deleteToken(c) {
 __name(deleteToken, "deleteToken");
 
 // src/routes/packages.js
-var import_validate_npm_package_name = __toESM(require_lib());
-var import_semver2 = __toESM(require_semver2());
+init_define_DMNO_INJECTED_CONFIG();
+var import_validate_npm_package_name = __toESM(require_lib(), 1);
+var import_semver2 = __toESM(require_semver2(), 1);
 import { Buffer as Buffer3 } from "node:buffer";
 
-// node_modules/hono/dist/helper/accepts/accepts.js
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/helper/accepts/index.js
+init_define_DMNO_INJECTED_CONFIG();
+
+// node_modules/.pnpm/hono@4.6.13/node_modules/hono/dist/helper/accepts/accepts.js
+init_define_DMNO_INJECTED_CONFIG();
 var parseAccept = /* @__PURE__ */ __name((acceptHeader) => {
   const accepts2 = acceptHeader.split(",");
   return accepts2.map((accept) => {
@@ -6002,7 +6638,7 @@ async function getPackageManifest(c) {
   const manifest = JSON.parse(row.manifest);
   const ret = { ...manifest, ...{
     dist: {
-      tarball: `${DOMAIN}/${createFile({ pkg, version })}`
+      tarball: `${"http://localhost:1337"}/${createFile({ pkg, version })}`
     }
   } };
   return c.json(ret, 200);
@@ -6157,6 +6793,7 @@ if (PROXIES) {
   }
 }
 app.get("/", apiReference(API_DOCS));
+app.get("/openapi.json", (c) => c.json(API_DOCS.spec.content, 200));
 app.get("/-/ping", (c) => c.json({}, 200));
 app.use("*", except(isPrivate, bearerAuth({ verifyToken })));
 app.get("/-/whoami", getUsername);
