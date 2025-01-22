@@ -1,4 +1,5 @@
 .DS_Store
+node_modules/
 
 # Logs
 
@@ -172,3 +173,11 @@ out
 .dev.vars
 .wrangler/
 local-store
+
+# build output
+
+dist/
+
+# data/sqld
+
+data.sqld
