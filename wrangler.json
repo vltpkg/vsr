@@ -9,14 +9,14 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_id": "vsr_local_database_id",
-      "database_name": "vsr_local_database"
+      "database_id": "vsrlocaldatabaseid",
+      "database_name": "vsrlocaldatabase"
     }
   ],
   "r2_buckets": [
     {
       "binding": "BUCKET",
-      "bucket_name": "vsr_local_bucket"
+      "bucket_name": "vsrlocalbucket"
     }
   ],
   "assets": {
@@ -24,7 +24,7 @@
   },
   "dev": {
     "local_protocol": "http",
-    "port": 1337
+    "port": 7331
   },
   "placement": {
     "mode": "smart"

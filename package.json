@@ -11,9 +11,9 @@
     "vsr": "./bin/vsr"
   },
   "scripts": {
-    "setup": "wrangler d1 execute vsr_local_database --command \"CREATE TABLE IF NOT EXISTS packages ('name' TEXT PRIMARY KEY, tags JSON); CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, uuid TEXT, scope JSON); CREATE TABLE IF NOT EXISTS versions (spec TEXT PRIMARY KEY, manifest JSON, published_at TEXT); INSERT OR REPLACE INTO tokens (token, uuid, scope) VALUES ('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'admin', '[ { \\\"values\\\": [\\\"*\\\"], \\\"types\\\": { \\\"pkg\\\": { \\\"read\\\": true, \\\"write\\\": true } } }, { \\\"values\\\": [\\\"*\\\"], \\\"types\\\": { \\\"user\\\": { \\\"read\\\": true, \\\"write\\\": true } } } ]');\" --local --persist-to local-store --experimental-json-config",
-    "drop": "wrangler d1 execute vsr_local_database --command 'DROP TABLE IF EXISTS packages;DROP TABLE IF EXISTS tokens;DROP TABLE IF EXISTS versions;' --local --persist-to local-store --experimental-json-config && rm -rf local-store && rm -rf .wrangler",
-    "migrate": "wrangler d1 migrations apply vsr_local_database  --local --persist-to local-store --experimental-json-config",
+    "setup": "wrangler d1 execute vsrlocaldatabase --command \"CREATE TABLE IF NOT EXISTS packages ('name' TEXT PRIMARY KEY, tags JSON); CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, uuid TEXT, scope JSON); CREATE TABLE IF NOT EXISTS versions (spec TEXT PRIMARY KEY, manifest JSON, published_at TEXT); INSERT OR REPLACE INTO tokens (token, uuid, scope) VALUES ('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'admin', '[ { \\\"values\\\": [\\\"*\\\"], \\\"types\\\": { \\\"pkg\\\": { \\\"read\\\": true, \\\"write\\\": true } } }, { \\\"values\\\": [\\\"*\\\"], \\\"types\\\": { \\\"user\\\": { \\\"read\\\": true, \\\"write\\\": true } } } ]');\" --local --persist-to local-store --experimental-json-config",
+    "drop": "wrangler d1 execute vsrlocaldatabase --command 'DROP TABLE IF EXISTS packages;DROP TABLE IF EXISTS tokens;DROP TABLE IF EXISTS versions;' --local --persist-to local-store --experimental-json-config && rm -rf local-store && rm -rf .wrangler",
+    "migrate": "wrangler d1 migrations apply vsrlocaldatabase  --local --persist-to local-store --experimental-json-config",
     "dist": "wrangler dev ./dist/index.js --local --persist-to local-store --experimental-json-config",
     "dev": "wrangler dev --local --persist-to local-store --experimental-json-config",
     "bundle": "wrangler deploy --dry-run --outdir dist",
@@ -22,23 +22,23 @@
     "lint": "prettier ."
   },
   "devDependencies": {
-    "libnpmpack": "^7.0.4",
-    "npm-registry-fetch": "^17.1.0",
-    "prettier": "^3.3.3",
-    "ssri": "^10.0.6",
     "@hono-rate-limiter/cloudflare": "^0.2.1",
     "@scalar/hono-api-reference": "^0.5.158",
     "get-npm-tarball-url": "^2.1.0",
     "hono": "^4.5.5",
     "hono-rate-limiter": "^0.4.0",
     "js-yaml": "^4.1.0",
+    "libnpmpack": "^7.0.4",
+    "npm-registry-fetch": "^17.1.0",
+    "prettier": "^3.3.3",
     "semver": "^7.6.3",
+    "ssri": "^10.0.6",
     "streaming-tarball": "^1.0.3",
     "uuid": "^10.0.0",
     "validate-npm-package-name": "5.0.0"
   },
   "peerDependencies": {
-    "wrangler": "^3.84.1"
+    "wrangler": "^4.19.1"
   },
   "devEngines": {
     "runtime": {

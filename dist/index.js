@@ -119,7 +119,7 @@ var require_wrangler = __commonJS({
       },
       dev: {
         local_protocol: "http",
-        port: 1337
+        port: 7331
       },
       placement: {
         mode: "smart"

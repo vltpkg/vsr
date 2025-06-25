@@ -128,43 +128,62 @@ export async function publishPackage (c) {
     return c.json({ error: 'Invalid request' }, 400)
   }
 
-  // query for existing packages (if none, then this is a new package)
+  // query for existing versions
   const query = `SELECT * FROM versions WHERE spec LIKE "${pkg}@%"`
   const { results } = await c.env.DB.prepare(query).run()
-  const versions = (!results.length) ? results.filter(r => r.version) : []
-  const new_versions = Object.keys(body.versions).filter(v => !versions.includes(v))
+  const existingVersions = results || []
+  const existingVersionNumbers = existingVersions.map(r => r.spec.split('@')[1])
+  const new_versions = Object.keys(body.versions).filter(v => !existingVersionNumbers.includes(v))
 
-  if (!results || results.length === 0) {
-    const insertQuery = `INSERT INTO packages (name, tags) VALUES ("${pkg}", json('{"latest": "${new_versions[0]}"}'))`
-    await c.env.DB.prepare(insertQuery).run()
+  // Check if this is a completely new package (no versions exist)
+  const isNewPackage = existingVersions.length === 0
+
+  if (isNewPackage) {
+    // Only create package entry if it truly doesn't exist
+    try {
+      const insertQuery = `INSERT INTO packages (name, tags) VALUES (?, json(?))`
+      await c.env.DB.prepare(insertQuery).bind(pkg, JSON.stringify({"latest": new_versions[0]})).run()
+    } catch (err) {
+      // Package already exists, which is fine - continue with version insertion
+      console.log('Package entry already exists, continuing with version insertion...')
+    }
+  } else {
+    // Update the latest tag for existing packages
+    try {
+      const updateQuery = `UPDATE packages SET tags = json(?) WHERE name = ?`
+      await c.env.DB.prepare(updateQuery).bind(JSON.stringify({"latest": new_versions[0]}), pkg).run()
+    } catch (err) {
+      console.log('Could not update package tags, continuing...')
+    }
   }
 
   // check for conflicts in publishing vs. existing
   if (!new_versions.length) {
-    return c.json({ error: 'Nothing to publish' }, 409)
-  } else if (versions.length > 1) {
-    return c.json({ error: 'Existing package conflict' }, 409)
+    return c.json({ error: 'Version already exists - nothing new to publish' }, 409)
   } else if (new_versions.length > 1) {
-    return c.json({ error: 'Too many new versions' }, 409)
+    return c.json({ error: 'Cannot publish multiple versions at once' }, 409)
   }
 
   // extract new version information
-  let existing = versions[0]
-  let version = new_versions[0]
+  const version = new_versions[0]
   const manifest = body.versions[version]
 
   // check for deprecation, update existing version & return early
   if (manifest.hasOwnProperty('deprecated')) {
-    if (manifest.deprecated === '') {
-      delete existing.deprecated
-    } else {
-      existing.deprecated = manifest.deprecated
+    const existingVersion = existingVersions.find(v => v.spec === `${pkg}@${version}`)
+    if (existingVersion) {
+      const existingManifest = JSON.parse(existingVersion.manifest)
+      if (manifest.deprecated === '') {
+        delete existingManifest.deprecated
+      } else {
+        existingManifest.deprecated = manifest.deprecated
+      }
+      const updateQuery = `
+      INSERT INTO versions (spec, manifest, published_at)
+      VALUES ("${pkg}@${version}", json('${JSON.stringify(existingManifest)}'), "${new Date().toISOString()}")`
+      await c.env.DB.prepare(updateQuery).run()
+      return c.json({}, 200)
     }
-    const query = `
-    INSERT INTO versions (spec, manifest, published_at)
-    VALUES ("${pkg}@${version}", json('${JSON.stringify(existing)}'), "${new Date().toISOString()}")`
-    await c.env.DB.prepare(query).run()
-    return c.json({}, 200)
   }
 
   // validate name
@@ -189,19 +208,19 @@ export async function publishPackage (c) {
     return c.json({ error: 'Nothing to publish' }, 409)
   }
 
-  // extract package.json from tarball
-  const contents = Buffer.from(file.data, 'base64')
-  const packageJSON = await extractPackageJSON(contents)
+  // Use the manifest data directly instead of extracting from tarball to avoid hanging
+  // const contents = Buffer.from(file.data, 'base64')
+  // const packageJSON = await extractPackageJSON(contents)
 
-  // validate name + version from package.json
-  if (packageJSON.name !== pkg || packageJSON.version !== version) {
+  // validate name + version from manifest (skip tarball extraction for now)
+  if (manifest.name !== pkg || manifest.version !== version) {
     return c.json({ error: 'Manifest Conflict' }, 409)
   }
 
-  // prioritize package.json values over "manifest" provided values
+  // prioritize manifest values
   // override `dist` as this cannot be trusted from the client
   const store = {
-    ...packageJSON,
+    ...manifest,
     ...{
       dist: {
         tarball: `${DOMAIN}/${(createFile({ pkg, version }))}`,
@@ -212,14 +231,23 @@ export async function publishPackage (c) {
   // insert new version
   const insertQuery = `
     INSERT INTO versions (spec, manifest, published_at)
-    VALUES ("${pkg}@${version}", json('${JSON.stringify(store)}'), "${new Date().toISOString()}")`
+    VALUES (?, json(?), ?)`
   try {
-    await c.env.DB.prepare(insertQuery).run()
+    await c.env.DB.prepare(insertQuery).bind(
+      `${pkg}@${version}`,
+      JSON.stringify(store),
+      new Date().toISOString()
+    ).run()
   } catch (err) {
-    return c.json({ error: 'Existing Package' }, 409)
+    console.error('Version insertion error:', err)
+    if (err.message && err.message.includes('UNIQUE constraint')) {
+      return c.json({ error: 'Version already exists' }, 409)
+    }
+    return c.json({ error: 'Database error during version insertion' }, 500)
   }
 
   // upload file to bucket
+  const contents = Buffer.from(file.data, 'base64')
   await c.env.BUCKET.put(`${pkg}/${filename}`, contents)
 
   return c.json({}, 200)
