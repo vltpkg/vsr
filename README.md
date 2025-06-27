@@ -1,3 +1,3 @@
 # Placeholder
 
-This repo will soon move to `vltpkg/vltpkg` as a workspace.
+This repo has moved to [`vltpkg/vltpkg`](https://github.com/vltpkg/vltpkg) as a workspace.
