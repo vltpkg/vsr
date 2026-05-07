@@ -1,3 +1,7 @@
-# Placeholder
+# vsr - vlt serverless registry
 
-This repo has moved to [`vltpkg/vltpkg`](https://github.com/vltpkg/vltpkg) as a workspace ("[src/registry](https://github.com/vltpkg/vltpkg/tree/main/src/registry)").
+```bash
+vlx @vltpkg/vsr
+```
+
+> Note: This repo is in transition - updates are being backported from [`vltpkg/vltpkg`](https://github.com/vltpkg/vltpkg) where this project was temporarily under development as a workspace.
