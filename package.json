@@ -1,0 +1,115 @@
+{
+  "name": "@vltpkg/vsr",
+  "version": "1.0.0-rc.18",
+  "description": "vlt serverless registry – a minimal npm-compatible package registry",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vltpkg/vsr.git"
+  },
+  "homepage": "https://www.vlt.sh/serverless-registry",
+  "bugs": [
+    {
+      "type": "link",
+      "url": "https://github.com/vltpkg/vsr/issues"
+    }
+  ],
+  "author": {
+    "name": "vlt technology inc.",
+    "email": "support@vlt.sh",
+    "url": "http://vlt.sh"
+  },
+  "license": "FSL-1.1-MIT",
+  "type": "module",
+  "bin": {
+    "vsr": "./dist/bin/vsr.js"
+  },
+  "files": [
+    "dist",
+    "config.ts",
+    "types.ts",
+    "wrangler.json",
+    "vlt.json.example",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "packageManager": "vlt@1.0.0-rc.29",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@better-auth/api-key": "^1.6.11",
+    "@hono/sentry": "^1.2.2",
+    "@hono/zod-openapi": "^0.19.10",
+    "@libsql/client": "^0.15.15",
+    "@scalar/hono-api-reference": "^0.9.28",
+    "@vltpkg/vlt-json": "^1.0.0-rc.29",
+    "better-auth": "^1.6.11",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.8",
+    "minargs": "^2.1.0",
+    "semver": "^7.7.2",
+    "validate-npm-package-name": "6.0.2",
+    "wrangler": "^4.53.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.71",
+    "@cloudflare/workers-types": "^4.20251209.0",
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.0",
+    "@types/semver": "^7.5.8",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "@vltpkg/gui": "^1.0.0-rc.18",
+    "chokidar-cli": "^3.0.0",
+    "drizzle-kit": "^0.31.8",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "build": "vlr build:dist && vlr build:assets && vlr build:worker && vlr build:web && vlr build:bin",
+    "build:assets": "node scripts/build-assets.js",
+    "build:bin": "node scripts/build-bin.js",
+    "build:web": "node scripts/build-web.js",
+    "build:dist": "node -e \"const fs=require('fs'); fs.rmSync('./dist', {recursive: true, force: true}); fs.mkdirSync('./dist/assets/public', {recursive: true});\"",
+    "build:worker": "wrangler deploy --dry-run --outdir dist",
+    "db:drop": "wrangler d1 execute vsr-local-database --file=src/db/migrations/drop.sql --local --persist-to=local-store --no-remote && node -e \"const fs=require('fs'); fs.rmSync('local-store',{recursive:true,force:true}); fs.rmSync('.wrangler',{recursive:true,force:true});\"",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:setup": "wrangler d1 execute vsr-local-database --file=src/db/migrations/0000_initial.sql --local --persist-to=local-store --no-remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0001_wealthy_magdalene.sql --local --persist-to=local-store --no-remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0002_better_auth.sql --local --persist-to=local-store --no-remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0003_api_keys.sql --local --persist-to=local-store --no-remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0004_version_downloads.sql --local --persist-to=local-store --no-remote",
+    "db:studio": "drizzle-kit studio --port 4985",
+    "deploy": "vlr build && wrangler deploy",
+    "format": "prettier --write . --log-level warn --cache",
+    "format:check": "prettier --check . --cache",
+    "postinstall": "node -e \"const fs=require('fs'); process.exit(fs.existsSync('local-store') || process.env.VERCEL || process.env.CI ? 0 : 1);\" || vlr db:setup",
+    "db:setup:remote": "wrangler d1 execute vsr-local-database --file=src/db/migrations/0000_initial.sql --remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0001_wealthy_magdalene.sql --remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0002_better_auth.sql --remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0003_api_keys.sql --remote && wrangler d1 execute vsr-local-database --file=src/db/migrations/0004_version_downloads.sql --remote",
+    "db:seed": "node scripts/seed-admin.js",
+    "web:dev": "vlt run -w web dev",
+    "web:build": "vlt run -w web build",
+    "web:typecheck": "vlt run -w web typecheck",
+    "web:preview": "vlt run -w web preview",
+    "web:deploy": "vlt run -w web deploy",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "prepack": "vlr build",
+    "serve:build": "vlr build && node ./dist/bin/vsr.js --debug",
+    "serve:start": "node ./dist/bin/vsr.js --debug --no-web",
+    "serve:death": "echo \"Killing wrangler dev processes...\" && (pkill -f 'wrangler.*dev' || true) && (pkill -f 'dist/bin/vsr.js' || true) && sleep 1 && (pids=$(lsof -ti :1337 2>/dev/null; lsof -ti :3000 2>/dev/null) && [ -n \"$pids\" ] && echo \"Force killing remaining processes: $pids\" && kill -9 $pids || echo \"No remaining processes found\") && echo \"Done.\"",
+    "serve:death:registry": "pkill -f 'wrangler.*dev' 2>/dev/null || true; pkill -f 'dist/bin/vsr.js' 2>/dev/null || true; sleep 0.5; for pid in $(lsof -ti :1337 2>/dev/null); do kill -9 $pid 2>/dev/null || true; done",
+    "serve:reload": "vlr serve:death:registry && vlr build:worker && vlr build:bin && vlr serve:start",
+    "serve:watch": "node scripts/serve-watch.js",
+    "snap": "vitest --no-watch -u",
+    "pretest": "vlr build",
+    "test": "vitest --no-watch",
+    "posttest": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "typecheck:worker": "tsc -p tsconfig.worker.json --noEmit"
+  }
+}

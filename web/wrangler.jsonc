@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vsr-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  // Public env (also available in the browser via NEXT_PUBLIC_*).
+  // Override per environment with `wrangler secret put` or env overrides.
+  "vars": {
+    "NEXT_PUBLIC_VSR_URL": "http://localhost:1337"
+  }
+}

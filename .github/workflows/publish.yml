@@ -12,9 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  publish:
     name: Publish vlt serverless registry
-
     runs-on: ubuntu-latest
 
     steps:
@@ -23,13 +22,22 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install vlt
+        run: npm install -g vlt
+
       - name: Install dependencies
-        run: npm install
+        run: vlt install
 
       - name: Build
-        run: npm run build
+        run: vlr build
 
-      - name: Run Publish
-        run: cd dist && ls -la
-        # env:
-        #   VLT_CLI_PUBLISH_TOKEN: ${{ secrets.VLT_CLI_PUBLISH_TOKEN }}
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

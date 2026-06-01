@@ -1,0 +1,23 @@
+# Use "files" in package.json as the source of truth.
+# This file remains so older npm clients that fall back to .npmignore still
+# exclude noisy directories.
+.github/
+.wrangler/
+local-store/
+node_modules/
+src/
+scripts/
+test/
+info/
+coverage/
+*.tsbuildinfo
+vlt-lock.json
+.dev.vars
+.env*
+.gitignore
+.prettierignore
+.prettierrc*
+eslint.config.*
+drizzle.config.*
+vitest.config.*
+tsconfig*.json

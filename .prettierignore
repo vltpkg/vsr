@@ -1,0 +1,9 @@
+dist/
+node_modules/
+.wrangler/
+local-store/
+coverage/
+src/db/migrations/
+src/assets/
+*.tsbuildinfo
+vlt-lock.json

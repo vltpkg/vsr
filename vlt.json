@@ -1,0 +1,5 @@
+{
+  "workspaces": {
+    "web": "web"
+  }
+}
