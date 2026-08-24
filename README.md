@@ -33,9 +33,10 @@ vsr --help        # full flag reference
 
 ## 💻 Development Requirements
 
-- Node.js
-- Wrangler
-- VLT
+- [Node.js](https://nodejs.org/en)
+- [wrangler](https://developers.cloudflare.com/workers/wrangler/)
+- [vlt CLI](https://docs.vlt.io/cli)
+  - Install with `curl -fsSL https://install.vlt.sh | bash`
 
 ## 📚 Resources
 
