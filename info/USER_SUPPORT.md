@@ -2,19 +2,19 @@
 
 ## News
 
-- Home: <https://vlt.sh>
-- Blog: <https://blog.vlt.sh/>
+- Home: <https://vlt.io>
+- Blog: <https://blog.vlt.io/>
 
 ## Official Documentation
 
-- CLI: <https://docs.vlt.sh/cli>
-- VSR: <https://docs.vlt.sh/registry>
+- CLI: <https://docs.vlt.io/cli>
+- VSR: <https://docs.vlt.io/registry>
 
 ## Social Media
 
 - GitHub: <https://github.com/vltpkg>
 - Linkedin: <https://www.linkedin.com/company/vltpkg/>
-- Bluesky: <https://bsky.app/profile/vlt.sh>
+- Bluesky: <https://bsky.app/profile/vlt.io>
 - Twitter: <https://x.com/vltpkg>
 - Discord: <https://discord.gg/vltpkg>
 - Youtube: <https://www.youtube.com/@vltpkg>
