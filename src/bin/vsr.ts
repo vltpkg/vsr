@@ -174,7 +174,7 @@ function loadVltConfig(configPath?: string): VsrConfig {
     if (configPath) {
       // Custom config path specified
       if (!existsSync(configPath)) {
-        // eslint-disable-next-line no-console
+         
         console.warn(`Config file not found: ${configPath}`)
         return {}
       }
@@ -184,7 +184,7 @@ function loadVltConfig(configPath?: string): VsrConfig {
       try {
         configData = JSON.parse(configContent) as VsrConfig
       } catch (_err) {
-        // eslint-disable-next-line no-console
+         
         console.warn(`Failed to parse config file ${configPath}`)
         return {}
       }
@@ -251,7 +251,7 @@ const QUEUE_NAME_OVERRIDE = getStringValue(args['queue-name'])
 
 // Print usage information
 function printUsage(): void {
-  // eslint-disable-next-line no-console
+   
   console.log(usage)
 }
 
@@ -319,30 +319,30 @@ async function deployToCloudflare(): Promise<void> {
 
   if (DRY_RUN) {
     wranglerArgs.push('--dry-run')
-    // eslint-disable-next-line no-console
+     
     console.log(
       '🔍 Dry run - would execute:',
       wranglerBin,
       wranglerArgs.join(' '),
     )
-    // eslint-disable-next-line no-console
+     
     console.log('\n📋 Deployment configuration:')
-    // eslint-disable-next-line no-console
+     
     console.log(`  Environment: ${ENV}`)
-    // eslint-disable-next-line no-console
+     
     console.log(`  Database: ${databaseName}`)
-    // eslint-disable-next-line no-console
+     
     console.log(`  Bucket: ${bucketName}`)
-    // eslint-disable-next-line no-console
+     
     console.log(`  Queue: ${queueName}`)
-    // eslint-disable-next-line no-console
+     
     console.log(`  Sentry DSN: ${sentryDsn}`)
-    // eslint-disable-next-line no-console
+     
     console.log(`  Sentry Environment: ${sentryEnv}`)
     return
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`🚀 Deploying VSR to ${ENV} environment...`)
 
   return new Promise((resolve, reject) => {
@@ -353,7 +353,7 @@ async function deployToCloudflare(): Promise<void> {
 
     deployProcess.on('close', code => {
       if (code === 0) {
-        // eslint-disable-next-line no-console
+         
         console.log(`✅ Successfully deployed VSR to ${ENV}`)
         resolve()
       } else {
@@ -377,7 +377,7 @@ if (args.help) {
 
 // Validate command
 if (!['dev', 'deploy'].includes(command)) {
-  // eslint-disable-next-line no-console
+   
   console.error(`❌ Unknown command: ${command}`)
   printUsage()
   process.exit(1)
@@ -403,8 +403,9 @@ const wranglerRelBinPath = (
     bin: { wrangler: string }
   }
 ).bin.wrangler
-const wranglerBinPath = require.resolve(
-  path.join('wrangler', wranglerRelBinPath),
+const wranglerBinPath = path.resolve(
+  path.dirname(wranglerPkgPath),
+  wranglerRelBinPath,
 )
 const wranglerBin =
   existsSync(wranglerBinPath) ? wranglerBinPath : 'wrangler'
@@ -460,8 +461,7 @@ function runDev(): void {
   const shutdown = (signal: NodeJS.Signals | 'exit', code = 0) => {
     if (shuttingDown) return
     shuttingDown = true
-    const sig: NodeJS.Signals =
-      signal === 'exit' ? 'SIGTERM' : signal
+    const sig: NodeJS.Signals = signal === 'exit' ? 'SIGTERM' : signal
     for (const child of children) {
       if (child.exitCode === null) killTree(child.pid, sig)
     }
@@ -478,7 +478,7 @@ function runDev(): void {
   process.on('SIGTERM', () => shutdown('SIGTERM', 0))
 
   // --- registry ---------------------------------------------------
-  // eslint-disable-next-line no-console
+   
   console.log(`VSR registry  : http://${HOST}:${PORT}`)
   const registry = spawn(
     wranglerBin,
@@ -499,9 +499,7 @@ function runDev(): void {
       // Hand the registry the web UI origin (when one's running) so
       // it can: (a) trust the origin for CORS + Better Auth, and (b)
       // redirect `/` to the human-facing UI instead of `/-/docs`.
-      ...(NO_WEB
-        ? []
-        : [`--var=WEB_URL:http://${HOST}:${WEB_PORT}`]),
+      ...(NO_WEB ? [] : [`--var=WEB_URL:http://${HOST}:${WEB_PORT}`]),
     ],
     {
       cwd: registryRoot,
@@ -514,24 +512,26 @@ function runDev(): void {
   if (!DEBUG) {
     // Forward only stderr by default so failure modes are visible
     // without drowning the user in wrangler's banner spam.
-    registry.stderr?.on('data', (b: Buffer) => process.stderr.write(b))
+    registry.stderr?.on('data', (b: Buffer) =>
+      process.stderr.write(b),
+    )
   }
   registry.on('exit', code => {
     if (shuttingDown) return
-    // eslint-disable-next-line no-console
+     
     console.error(`registry exited (code=${code})`)
     shutdown('exit', code ?? 1)
   })
 
   // --- web UI -----------------------------------------------------
   if (NO_WEB) {
-    // eslint-disable-next-line no-console
+     
     console.log('VSR web UI    : disabled (--no-web)')
     return
   }
 
   if (!existsSync(webServerEntry)) {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       `VSR web UI    : missing build (${webServerEntry}). ` +
         'Run `vlr build` or pass `--no-web` to silence this.',
@@ -539,41 +539,37 @@ function runDev(): void {
     return
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`VSR web UI    : http://${HOST}:${WEB_PORT}`)
-  const web = spawn(
-    process.execPath,
-    [webServerEntry],
-    {
-      cwd: path.dirname(webServerEntry),
-      stdio: DEBUG ? 'inherit' : ['ignore', 'pipe', 'pipe'],
-      env: {
-        ...process.env,
-        // Next.js standalone reads these.
-        PORT: String(WEB_PORT),
-        HOSTNAME: HOST,
-        // Where the web app's RSC fetches + `/-/*` rewrites resolve.
-        VSR_ORIGIN: `http://${HOST}:${PORT}`,
-        // Better Auth wants the user-facing origin so cookies and
-        // redirect URLs line up with the browser.
-        BETTER_AUTH_URL:
-          process.env.BETTER_AUTH_URL ?? `http://${HOST}:${WEB_PORT}`,
-      },
-      detached: true,
+  const web = spawn(process.execPath, [webServerEntry], {
+    cwd: path.dirname(webServerEntry),
+    stdio: DEBUG ? 'inherit' : ['ignore', 'pipe', 'pipe'],
+    env: {
+      ...process.env,
+      // Next.js standalone reads these.
+      PORT: String(WEB_PORT),
+      HOSTNAME: HOST,
+      // Where the web app's RSC fetches + `/-/*` rewrites resolve.
+      VSR_ORIGIN: `http://${HOST}:${PORT}`,
+      // Better Auth wants the user-facing origin so cookies and
+      // redirect URLs line up with the browser.
+      BETTER_AUTH_URL:
+        process.env.BETTER_AUTH_URL ?? `http://${HOST}:${WEB_PORT}`,
     },
-  )
+    detached: true,
+  })
   children.push(web)
   if (!DEBUG) {
     web.stderr?.on('data', (b: Buffer) => process.stderr.write(b))
   }
   web.on('exit', code => {
     if (shuttingDown) return
-    // eslint-disable-next-line no-console
+     
     console.error(`web UI exited (code=${code})`)
     shutdown('exit', code ?? 1)
   })
 
-  // eslint-disable-next-line no-console
+   
   console.log(`\nOpen http://${HOST}:${WEB_PORT} in your browser.\n`)
 }
 
@@ -585,7 +581,7 @@ void (async () => {
     }
     runDev()
   } catch (error: unknown) {
-    // eslint-disable-next-line no-console
+     
     console.error('Failed to start:', error)
     process.exit(1)
   }
