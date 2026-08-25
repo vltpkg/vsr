@@ -42,7 +42,8 @@ export default function TwoFactorPage() {
   const [password, setPassword] = useState('')
   const [pending, setPending] = useState(false)
   const [step, setStep] = useState<EnableStep>('idle')
-  const [enrollment, setEnrollment] = useState<EnrollmentSnapshot | null>(null)
+  const [enrollment, setEnrollment] =
+    useState<EnrollmentSnapshot | null>(null)
   const [code, setCode] = useState('')
 
   // Reset the local enrolment state if the session toggles enabled — for
@@ -64,13 +65,17 @@ export default function TwoFactorPage() {
       toast.error(res.error.message ?? 'Could not start enrolment')
       return
     }
-    if (!res.data?.totpURI) {
+    if (
+      !res.data ||
+      res.data.method !== 'totp' ||
+      !res.data.totpURI
+    ) {
       toast.error('Server returned no TOTP URI')
       return
     }
     setEnrollment({
       totpURI: res.data.totpURI,
-      backupCodes: (res.data.backupCodes as string[] | undefined) ?? [],
+      backupCodes: res.data.backupCodes ?? [],
     })
     setStep('verify')
     setPassword('')
@@ -110,13 +115,16 @@ export default function TwoFactorPage() {
     <div className="space-y-6">
       <header className="space-y-1">
         <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Two-factor</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Two-factor
+          </h1>
           <Badge variant={enabled ? 'secondary' : 'outline'}>
             {enabled ? 'Enabled' : 'Disabled'}
           </Badge>
         </div>
         <p className="text-muted-foreground text-sm">
-          Adds a TOTP step after your password. Some publish flows require it.
+          Adds a TOTP step after your password. Some publish flows
+          require it.
         </p>
       </header>
 
@@ -169,8 +177,8 @@ function EnableStartCard({
         <ShieldCheck className="text-muted-foreground size-5" />
         <CardTitle>Enable two-factor</CardTitle>
         <CardDescription>
-          We&apos;ll generate a TOTP secret and a fresh set of backup codes.
-          Confirm your password to continue.
+          We&apos;ll generate a TOTP secret and a fresh set of backup
+          codes. Confirm your password to continue.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -216,8 +224,9 @@ function EnableVerifyCard({
       <CardHeader>
         <CardTitle>Scan & verify</CardTitle>
         <CardDescription>
-          Scan the QR with your authenticator app (1Password, Authy, Google
-          Authenticator…), then enter the 6-digit code it generates.
+          Scan the QR with your authenticator app (1Password, Authy,
+          Google Authenticator…), then enter the 6-digit code it
+          generates.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -254,7 +263,11 @@ function EnableVerifyCard({
             <Button type="submit" disabled={pending}>
               {pending ? 'Verifying…' : 'Verify & enable'}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+            >
               Cancel
             </Button>
           </div>
@@ -281,8 +294,8 @@ function DisableCard({
         <ShieldOff className="text-muted-foreground size-5" />
         <CardTitle>Disable two-factor</CardTitle>
         <CardDescription>
-          Removes the TOTP secret and all unused backup codes. You&apos;ll need
-          to re-enrol to turn it back on.
+          Removes the TOTP secret and all unused backup codes.
+          You&apos;ll need to re-enrol to turn it back on.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -299,7 +312,11 @@ function DisableCard({
               onChange={e => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" variant="destructive" disabled={pending}>
+          <Button
+            type="submit"
+            variant="destructive"
+            disabled={pending}
+          >
             {pending ? 'Disabling…' : 'Disable two-factor'}
           </Button>
         </form>

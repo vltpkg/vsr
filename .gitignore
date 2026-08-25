@@ -49,3 +49,5 @@ dist/
 
 # data/sqld
 data.sqld
+# headroom mcp
+.serena/**
