@@ -106,7 +106,7 @@ development and deployment settings:
 }
 ```
 
-See the [Deployment Guide](../DEPLOY.md) for complete deployment
+See the [Deployment Guide](./DEPLOY.md) for complete deployment
 configuration documentation.
 
 ## Package Manager Integration
